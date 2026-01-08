@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSound } from 'use-sound';
-import { Plus, Trash2, Edit3, Check, Save, Target } from 'lucide-react';
+import { Plus, Trash2, Edit3, Check, Save, Target, RotateCcw } from 'lucide-react';
 
 import doneSfx from './music/done.mp3';
 import deleteSfx from './music/delete.mp3';
@@ -15,6 +15,19 @@ function Todo() {
 
     // Load tasks from localStorage on mount
     useEffect(() => {
+        const today = new Date().toDateString();
+        const savedDate = localStorage.getItem('todoro-date');
+        
+        // Check if it's a new day - if so, clear all tasks
+        if (savedDate !== today) {
+            localStorage.removeItem('todoro-tasks');
+            localStorage.removeItem('todoro-accomplished');
+            localStorage.setItem('todoro-date', today);
+            setTasks([]);
+            setAccomplishedTasks([]);
+            return;
+        }
+
         const savedTasks = localStorage.getItem('todoro-tasks');
         const savedAccomplished = localStorage.getItem('todoro-accomplished');
 
@@ -95,6 +108,13 @@ function Todo() {
         setEditingIndex(null);
     }
 
+    function clearAllTasks() {
+        setTasks([]);
+        setAccomplishedTasks([]);
+        localStorage.removeItem('todoro-tasks');
+        localStorage.removeItem('todoro-accomplished');
+    }
+
     const completionPercentage = ((accomplishedTasks.length / (tasks.length + accomplishedTasks.length)) * 100) || 0;
 
     return (
@@ -117,6 +137,17 @@ function Todo() {
                         {accomplishedTasks.length} of {tasks.length + accomplishedTasks.length} tasks done
                     </div>
                 </div>
+                
+                {(tasks.length > 0 || accomplishedTasks.length > 0) && (
+                    <button
+                        className="clear-all-btn"
+                        onClick={clearAllTasks}
+                        title="Clear all tasks"
+                    >
+                        <RotateCcw size={16} />
+                        Clear All
+                    </button>
+                )}
             </div>
 
             <div className="task-input-section">
