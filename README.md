@@ -7,7 +7,7 @@ of the things to do could be handled better with proper time management.
 Hence, To-doro.
 ______________________________________________________________________________
 
-A pomodo x todo app to aid with upskilling in coding in ReactJS.
+A pomodoro x todo app to aid with upskilling in coding in ReactJS.
 
 ![To-doro Logo](./to-do...ro/public/mylogo.png)
 

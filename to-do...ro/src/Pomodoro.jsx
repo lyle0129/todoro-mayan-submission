@@ -121,16 +121,17 @@ function Pomodoro({
             }
 
             if (isWorkSession) {
-                let newCount = pomodoroCount;
-                if (newCount % longBreakInterval === 0) {
+                const newCount = pomodoroCount + 1;
+                setPomodoroCount(newCount);
+
+                // Check if this completed work session should trigger a long break
+                if (pomodoroCount % longBreakInterval === 0) {
                     setIsWorkSession(false);
                     setTimeLeft(longBreakDuration);
                 } else {
                     setIsWorkSession(false);
                     setTimeLeft(shortBreakDuration);
                 }
-                newCount = pomodoroCount + 1;
-                setPomodoroCount(newCount);
                 setIsRunning(false);
                 setHasStarted(false);
             } else {
