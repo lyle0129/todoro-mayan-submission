@@ -1,14 +1,116 @@
+import { useState, useEffect } from 'react';
 import Pomodoro from './Pomodoro.jsx'
 import Todo from './Todo.jsx'
+import Settings, { THEMES } from './Settings.jsx'
+import { Settings as SettingsIcon } from 'lucide-react'
+import './App.css'
 
 function App() {
+  // Theme state
+  const [currentTheme, setCurrentTheme] = useState('dark');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isTodoVisible, setIsTodoVisible] = useState(true);
 
+  // Timer settings state
+  const [timerSettings, setTimerSettings] = useState({
+    workDuration: 25 * 60,
+    shortBreakDuration: 5 * 60,
+    longBreakDuration: 15 * 60,
+    longBreakInterval: 3
+  });
+
+  // Load settings from localStorage on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('todoro-theme');
+    const savedSettings = localStorage.getItem('todoro-settings');
+    const savedTodoVisibility = localStorage.getItem('todoro-todo-visible');
+
+    if (savedTheme && THEMES[savedTheme]) {
+      setCurrentTheme(savedTheme);
+    }
+
+    if (savedSettings) {
+      try {
+        const parsed = JSON.parse(savedSettings);
+        setTimerSettings(parsed);
+      } catch (e) {
+        console.error('Failed to parse saved settings');
+      }
+    }
+
+    if (savedTodoVisibility !== null) {
+      setIsTodoVisible(JSON.parse(savedTodoVisibility));
+    }
+  }, []);
+
+  // Apply theme to document root
+  useEffect(() => {
+    const theme = THEMES[currentTheme];
+    if (theme) {
+      document.documentElement.style.setProperty('--theme-gradient', theme.gradient);
+      document.documentElement.style.setProperty('--theme-primary', theme.primary);
+      document.documentElement.style.setProperty('--theme-secondary', theme.secondary);
+      document.documentElement.style.setProperty('--theme-accent', theme.accent);
+    }
+  }, [currentTheme]);
+
+  const handleThemeChange = (newTheme) => {
+    setCurrentTheme(newTheme);
+    localStorage.setItem('todoro-theme', newTheme);
+  };
+
+  const handleDurationChange = (newSettings) => {
+    setTimerSettings(newSettings);
+    localStorage.setItem('todoro-settings', JSON.stringify(newSettings));
+  };
+
+  const toggleTodoVisibility = () => {
+    const newVisibility = !isTodoVisible;
+    setIsTodoVisible(newVisibility);
+    localStorage.setItem('todoro-todo-visible', JSON.stringify(newVisibility));
+  };
 
   return (
-    <>
-      <Pomodoro/>
-      <Todo/>
-    </>
+    <div className="app-container">
+      <div className="app-header">
+        <div className={`header-content ${!isTodoVisible ? 'centered-header' : ''}`}>
+          <div className="title-section">
+            <h1 className="app-title">To-doRo</h1>
+            <p className="app-subtitle">Productivity meets simplicity</p>
+          </div>
+          <button
+            className="settings-trigger"
+            onClick={() => setIsSettingsOpen(true)}
+            title="Settings"
+          >
+            <SettingsIcon size={24} />
+          </button>
+        </div>
+      </div>
+      <div className={`app-content ${!isTodoVisible ? 'centered' : ''}`}>
+        <Pomodoro
+          workDuration={timerSettings.workDuration}
+          shortBreakDuration={timerSettings.shortBreakDuration}
+          longBreakDuration={timerSettings.longBreakDuration}
+          longBreakInterval={timerSettings.longBreakInterval}
+          isTodoVisible={isTodoVisible}
+          onToggleTodo={toggleTodoVisibility}
+        />
+        {isTodoVisible && <Todo />}
+      </div>
+
+      <Settings
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        theme={currentTheme}
+        onThemeChange={handleThemeChange}
+        workDuration={timerSettings.workDuration}
+        shortBreakDuration={timerSettings.shortBreakDuration}
+        longBreakDuration={timerSettings.longBreakDuration}
+        longBreakInterval={timerSettings.longBreakInterval}
+        onDurationChange={handleDurationChange}
+      />
+    </div>
   )
 }
 

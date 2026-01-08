@@ -1,320 +1,1200 @@
 
-/* ---------- CSS for Pomodoro ---------- */
-
-body{
-  font-family: Arial, Sans-serif;
-  background-color: bisque;
-}
-
-.pomodoro-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background-color: hsl(0, 0%, 10%);
-  color: white;
-  border-radius: 16px 16px 0 0 ;
-  box-shadow: 0 4px 12px hsla(0, 0%, 0%, 0.3);
-  height: 50vh;
-}
-
-.pomodoro-title {
-  font-size: 5rem;
-  font-weight: bold;
-  margin-bottom: 16px;
-}
-
-.pomodoro-timer {
-  font-size: 18rem;
-  font-family: monospace;
-  margin-bottom: 24px;
-}
-
-.pomodoro-buttons {
-  display: flex;
-  gap: 12px;
-}
-
-.pomodoro-button {
-  width: 200px;
-  height: 50px;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.2s ease-in-out;
-}
-
-.pomodoro-button.start {
-  background-color: hsl(142, 71%, 45%); /* green */
-}
-
-.pomodoro-button.start:hover {
-  background-color: hsl(142, 76%, 35%);
-  scale: 110%;
-}
-
-.pomodoro-button.pause {
-  background-color: hsl(45, 93%, 50%); /* yellow */
-}
-
-.pomodoro-button.pause:hover {
-  background-color: hsl(41, 96%, 40%);
-  scale: 110%;
-}
-
-.pomodoro-button.reset {
-  background-color: hsl(0, 84%, 60%); /* red */
-}
-
-.pomodoro-button.reset:hover {
-  background-color: hsl(0, 72%, 50%);
-  scale: 110%;
-}
-
-.pomodoro-modes {
-  margin-top: 10px;
-  display: flex;
-  gap: 12px;
-}
-
-.pomodoro-mode {
-  width: 200px;
-  height: 50px;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.2s ease-in-out;
-}
-
-.pomodoro-mode.work,.pomodoro-mode.shortBreak,.pomodoro-mode.longBreak{
-  background-color: hsl(277, 57%, 50%);
-}
-
-.pomodoro-mode.work:hover,.pomodoro-mode.shortBreak:hover,.pomodoro-mode.longBreak:hover{
-  background-color: hsl(277, 57%, 40%);
-  scale: 110%;
-}
-
-/* ---------- CSS for Todo ---------- */
-
-.todo-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 24px;
-  background-color: hsl(0, 0%, 10%);
-  color: white;
-  border-radius: 0 0 16px 16px;
-  box-shadow: 0 4px 12px hsla(0, 0%, 0%, 0.3);
-
-}
-
-.todo-status {
-  font-size: 3vh;
-  font-weight: bold;
-  margin-bottom: 16px;
-  padding: 12px;
-  border-radius: 12px;
-  width: 90vw;
-  text-align: center;
-  background-color: hsl(277, 57%, 50%);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-}
-
-.task-forms {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  width: 90vw;
-}
-
-.task-forms input {
-  flex: 1;
-  padding: 8px;
-  border-radius: 8px;
-  border: none;
-  outline: none;
-  font-size: 1rem;
-  width: 80vw;
-}
-
-.edit-text {
-  flex: 1;
-  padding: 8px;
-  border-radius: 8px;
-  border: none;
-  outline: none;
-  font-size: 1rem;
-  width: 60vw;
-}
-
-.add-button {
-  width: 10vw;
-  height: 40px;
-  border: none;
-  border-radius: 8px;
-  background-color: hsl(142, 71%, 45%);
-  color: white;
-  font-size: 1.2rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.2s ease-in-out;
-}
-
-.add-button:hover {
-  background-color: hsl(142, 76%, 35%);
-  scale: 110%;
-}
-
-.tasks ol, .done-tasks ol {
-  padding: 0;
+/* Modern CSS Reset and Base Styles */
+* {
   margin: 0;
-  width: 90%;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.tasks li, .done-tasks li {
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  color: #1f2937;
+  line-height: 1.6;
+}
+
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: white;
+}
+
+.app-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.app-subtitle {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  font-weight: 300;
+}
+
+.app-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  flex: 1;
+}
+
+/* ========== POMODORO HEADER ========== */
+.pomodoro-header {
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+/* ========== TASKS TOGGLE SECTION ========== */
+.todo-toggle-section {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.todo-toggle-pomodoro {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+}
+
+.todo-toggle-pomodoro:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.todo-toggle-pomodoro .toggle-text {
+  white-space: nowrap;
+}
+
+/* Desktop icons (left/right arrows) */
+.toggle-icon-desktop {
+  display: inline-flex;
+}
+
+/* Mobile icons (up/down arrows) - hidden by default */
+.toggle-icon-mobile {
+  display: none;
+}
+.pomodoro-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 600px;
+}
+
+.pomodoro-header {
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.session-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+  padding: 1rem 1.5rem;
+  border-radius: 16px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.session-type {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.session-icon {
+  color: #6366f1;
+}
+
+.session-count {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #6366f1;
+  background: white;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.timer-display {
+  margin: 2rem 0;
+  position: relative;
+}
+
+.timer-circle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-ring {
+  transform: rotate(-90deg);
+}
+
+.progress-ring-progress {
+  transition: stroke-dashoffset 0.3s ease;
+  stroke-linecap: round;
+}
+
+.timer-text {
+  position: absolute;
+  font-size: 3.5rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: #1f2937;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pomodoro-controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.control-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.control-btn.primary {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.control-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.control-btn.primary.running {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.control-btn.secondary {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  color: white;
+}
+
+.control-btn.secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(107, 114, 128, 0.4);
+}
+
+.session-modes {
+  display: flex;
+  gap: 0.5rem;
+  background: #f3f4f6;
+  padding: 0.5rem;
+  border-radius: 16px;
+}
+
+.mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent;
+  color: #6b7280;
+}
+
+.mode-btn:hover {
+  background: rgba(255,255,255,0.7);
+  color: #374151;
+}
+
+.mode-btn.active {
+  background: white;
+  color: #6366f1;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* ========== TODO STYLES ========== */
+.todo-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  display: flex;
+  flex-direction: column;
+  min-height: 600px;
+}
+
+.todo-header {
+  margin-bottom: 2rem;
+}
+
+.progress-section {
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.progress-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.progress-icon {
+  color: #6366f1;
+}
+
+.progress-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255,255,255,0.7);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.task-count {
+  font-size: 0.9rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+.task-input-section {
+  margin-bottom: 2rem;
+}
+
+.input-group {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.task-input {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.task-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.add-btn {
+  padding: 1rem;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.add-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+.add-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tasks-section {
+  flex: 1;
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-title.completed {
+  color: #059669;
+}
+
+.task-list, .completed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.task-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: hsl(0, 0%, 15%);
-  padding: 10px 12px;
-  margin-bottom: 8px;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  width: 90vw;
+  padding: 1rem 1.5rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 1px solid #f3f4f6;
+  transition: all 0.3s ease;
 }
 
-.tasks li span, .done-tasks li span {
+.task-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.task-text {
   flex: 1;
   font-size: 1rem;
+  color: #374151;
 }
 
-.tasks button, .done-tasks button {
-  width: 50px;
-  height: 40px;
-  margin-left: 8px;
-  padding: 6px 10px;
+.task-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  padding: 0.5rem;
   border: none;
-  border-radius: 6px;
-  font-weight: bold;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s ease-in-out;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.delete-button {
-  background-color: hsl(0, 79%, 70%);
-  color: white;
-}
-.delete-button:hover {
-  background-color: hsl(0, 72%, 60%);
-  scale: 110%;
+.action-btn.complete {
+  background: #dcfce7;
+  color: #059669;
 }
 
-.edit-button {
-  background-color: hsl(45, 92%, 66%);
-  color: black;
-}
-.edit-button:hover {
-  background-color: hsl(41, 96%, 40%);
-  color: white;
-  scale: 110%;
+.action-btn.complete:hover {
+  background: #bbf7d0;
+  transform: scale(1.1);
 }
 
-.done-button , .save-button{
-  background-color: hsl(142, 46%, 54%);
-  color: white;
-}
-.done-button:hover , .save-button:hover {
-  background-color: hsl(142, 76%, 35%);
-  scale: 110%;
+.action-btn.edit {
+  background: #fef3c7;
+  color: #d97706;
 }
 
-.done-tasks h2 {
-  font-size: 1.2rem;
-  margin: 16px 0 8px;
+.action-btn.edit:hover {
+  background: #fde68a;
+  transform: scale(1.1);
+}
+
+.action-btn.delete {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.action-btn.delete:hover {
+  background: #fecaca;
+  transform: scale(1.1);
+}
+
+.action-btn.save {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.action-btn.save:hover {
+  background: #bfdbfe;
+  transform: scale(1.1);
+}
+
+.edit-mode {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.edit-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.edit-input:focus {
+  border-color: #6366f1;
+}
+
+.empty-state {
   text-align: center;
-  color: hsl(142, 71%, 65%);
+  padding: 3rem 1rem;
+  color: #9ca3af;
 }
 
-/* ---------- Mobile Responsive Styles ---------- */
-@media (max-width: 768px) {  /* Tablets & smaller */
-  .pomodoro-container {
-    height: auto;
-    padding: 16px;
-  }
+.empty-icon {
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
 
-  .pomodoro-title {
-    font-size: 3rem;
-    text-align: center;
-  }
+.completed-section {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 2rem;
+}
 
-  .pomodoro-timer {
-    font-size: 8rem; /* smaller so it fits */
-    text-align: center;
-  }
+.completed-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
 
-  .pomodoro-buttons,
-  .pomodoro-modes {
-    flex-direction: column; /* stack vertically */
-    width: 100%;
-    gap: 8px;
-  }
+.completed-icon {
+  color: #059669;
+  flex-shrink: 0;
+}
 
-  .pomodoro-button,
-  .pomodoro-mode {
-    width: 100%;   /* full width on mobile */
-    height: 50px;
-    font-size: 1rem;
-  }
+.completed-text {
+  color: #6b7280;
+  text-decoration: line-through;
+  opacity: 0.8;
+}
 
-  .todo-status {
-    font-size: 1.2rem;
-    width: 100%;
+/* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 1024px) {
+  .app-content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
-
-  .task-forms {
-    flex-direction: column; /* stack input & button */
-    width: 100%;
-  }
-
-  .task-forms input,
-  .edit-text {
-    width: 100%;
-    font-size: 1rem;
-  }
-
-  .add-button {
-    width: 100%;
-    height: 45px;
-    font-size: 1rem;
-  }
-
-  .tasks li, .done-tasks li {
-    flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
-  }
-
-  .tasks button, .done-tasks button {
-    width: 100%;
-    margin: 4px 0 0 0;
+  
+  .app-title {
+    font-size: 2.5rem;
   }
 }
 
-@media (max-width: 480px) {  /* Small phones */
-  .pomodoro-title {
+@media (max-width: 768px) {
+  .app-container {
+    padding: 0.5rem;
+  }
+  
+  .app-title {
     font-size: 2rem;
   }
+  
+  .app-subtitle {
+    font-size: 1rem;
+  }
+  
+  .pomodoro-container,
+  .todo-container {
+    padding: 1.5rem;
+    border-radius: 20px;
+    min-height: auto;
+  }
+  
+  .timer-text {
+    font-size: 2.5rem;
+  }
+  
+  .pomodoro-controls {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .control-btn {
+    justify-content: center;
+    padding: 1rem;
+  }
+  
+  .session-modes {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .mode-btn {
+    justify-content: center;
+    padding: 1rem;
+  }
+  
+  .session-info {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .task-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .task-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .action-btn {
+    flex: 1;
+    padding: 0.75rem;
+  }
+}
 
-  .pomodoro-timer {
-    font-size: 5rem;
+@media (max-width: 480px) {
+  .app-title {
+    font-size: 1.8rem;
+  }
+  
+  .timer-text {
+    font-size: 2rem;
+  }
+  
+  .pomodoro-container,
+  .todo-container {
+    padding: 1rem;
+    border-radius: 16px;
+  }
+  
+  .input-group {
+    flex-direction: column;
+  }
+  
+  .add-btn {
+    padding: 1rem;
+  }
+}
+/* =====
+===== CSS VARIABLES FOR THEMES ========== */
+:root {
+  --theme-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --theme-primary: #6366f1;
+  --theme-secondary: #10b981;
+  --theme-accent: #f59e0b;
+}
+
+/* Update body background to use theme variable */
+body {
+  background: var(--theme-gradient);
+}
+
+/* Update header layout for settings button */
+.app-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: white;
+}
+
+/* Update header layout for better centering */
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.header-content.centered-header {
+  justify-content: center;
+}
+
+.header-content.centered-header .settings-trigger {
+  position: absolute;
+  right: 0;
+}
+
+.title-section {
+  flex: 1;
+  text-align: center;
+}
+
+.header-content.centered-header .title-section {
+  flex: none;
+}
+
+.settings-trigger {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 12px;
+  padding: 0.75rem;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.settings-trigger:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+/* ========== SETTINGS MODAL STYLES ========== */
+.settings-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.settings-modal {
+  background: white;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 2rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.settings-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #1f2937;
+}
+
+.settings-title h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.close-btn {
+  background: #f3f4f6;
+  border: none;
+  border-radius: 12px;
+  padding: 0.5rem;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.settings-content {
+  padding: 2rem;
+}
+
+.settings-section {
+  margin-bottom: 2.5rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  color: #374151;
+}
+
+.section-header h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Theme Selection Styles */
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.theme-option {
+  border: 3px solid transparent;
+  border-radius: 16px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 100px;
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-option:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.theme-option.active {
+  border-color: var(--theme-primary);
+  box-shadow: 0 0 0 1px var(--theme-primary);
+}
+
+.theme-preview {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.theme-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.theme-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+/* Duration Controls Styles */
+.duration-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.duration-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.duration-item label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.duration-item input {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.duration-item input:focus {
+  border-color: var(--theme-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Settings Footer */
+.settings-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem 2rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.footer-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.reset-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  background: white;
+  color: #6b7280;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.reset-btn:hover {
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+.cancel-btn {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  background: white;
+  color: #6b7280;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cancel-btn:hover {
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+.save-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  background: var(--theme-primary);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.save-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+/* Update existing styles to use CSS variables */
+.control-btn.primary {
+  background: linear-gradient(135deg, var(--theme-secondary), var(--theme-secondary));
+}
+
+.control-btn.primary.running {
+  background: linear-gradient(135deg, var(--theme-accent), var(--theme-accent));
+}
+
+.add-btn {
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-primary));
+}
+
+.mode-btn.active {
+  color: var(--theme-primary);
+}
+
+.session-icon {
+  color: var(--theme-primary);
+}
+
+.session-count {
+  color: var(--theme-primary);
+}
+
+.progress-icon {
+  color: var(--theme-primary);
+}
+
+.progress-fill {
+  background: linear-gradient(90deg, var(--theme-secondary), var(--theme-secondary));
+}
+
+.section-title.completed {
+  color: var(--theme-secondary);
+}
+
+.completed-icon {
+  color: var(--theme-secondary);
+}
+
+/* Mobile responsive for settings */
+@media (max-width: 768px) {
+  .settings-modal {
+    margin: 1rem;
+    max-height: calc(100vh - 2rem);
+  }
+  
+  .settings-header,
+  .settings-content,
+  .settings-footer {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  
+  .theme-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .duration-controls {
+    grid-template-columns: 1fr;
+  }
+  
+  .settings-footer {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  
+  .footer-actions {
+    justify-content: space-between;
+  }
+  
+  .header-content {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .theme-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .footer-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}/* 
+========== HEADER CONTROLS AND TODO TOGGLE ========== */
+/* Remove old header controls styles since we moved the button */
+.header-controls {
+  display: none;
+}
+
+.todo-toggle {
+  display: none;
+}
+
+/* ========== CENTERED LAYOUT WHEN TODO IS HIDDEN ========== */
+.app-content.centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 200px);
+}
+
+.app-content.centered .pomodoro-container {
+  max-width: 600px;
+  width: 100%;
+}
+
+/* ========== IMPROVED MOBILE MARGINS ========== */
+@media (max-width: 1024px) {
+  .app-container {
+    padding: 1rem;
+  }
+  
+  .app-content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin: 0 0.5rem;
+  }
+  
+  .app-title {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    padding: 0.75rem;
+  }
+  
+  .app-content {
+    margin: 0 0.75rem;
+  }
+  
+  .app-title {
+    font-size: 2rem;
+  }
+  
+  .app-subtitle {
+    font-size: 1rem;
+  }
+  
+  .pomodoro-container,
+  .todo-container {
+    padding: 1.5rem;
+    border-radius: 20px;
+    min-height: auto;
+    margin: 0 0.5rem;
+  }
+  
+  .header-content {
+    padding: 0 0.5rem;
+    flex-direction: row;
+    gap: 0;
+    text-align: center;
+  }
+  
+  .header-content.centered-header {
+    justify-content: center;
+  }
+  
+  .header-content.centered-header .settings-trigger {
+    position: absolute;
+    right: 0.5rem;
+  }
+  
+  .todo-toggle-pomodoro {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  
+  /* Switch to up/down arrows on mobile */
+  .toggle-icon-desktop {
+    display: none;
+  }
+  
+  .toggle-icon-mobile {
+    display: inline-flex;
+  }
+  
+  .title-section {
+    order: 1;
+  }
+  
+  /* Centered layout adjustments for mobile */
+  .app-content.centered {
+    min-height: calc(100vh - 250px);
+    margin: 0 1rem;
+  }
+  
+  .app-content.centered .pomodoro-container {
+    margin: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-container {
+    padding: 0.5rem;
+  }
+  
+  .app-content {
+    margin: 0 0.5rem;
+  }
+  
+  .app-title {
+    font-size: 1.8rem;
+  }
+  
+  .pomodoro-container,
+  .todo-container {
+    padding: 1rem;
+    border-radius: 16px;
+    margin: 0 0.25rem;
+  }
+  
+  .header-content {
+    padding: 0 0.25rem;
+  }
+  
+  /* Better spacing for very small screens */
+  .app-content.centered {
+    margin: 0 0.75rem;
+    min-height: calc(100vh - 220px);
+  }
+}
+
+/* ========== SMOOTH TRANSITIONS FOR LAYOUT CHANGES ========== */
+.app-content {
+  transition: all 0.3s ease;
+}
+
+.pomodoro-container {
+  transition: all 0.3s ease;
+}
+
+.todo-container {
+  transition: all 0.3s ease;
+}
+
+/* ========== FOCUS MODE ENHANCEMENTS ========== */
+.app-content.centered .pomodoro-container {
+  box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+  transform: scale(1.02);
+}
+
+@media (max-width: 768px) {
+  .app-content.centered .pomodoro-container {
+    transform: none;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
   }
 }

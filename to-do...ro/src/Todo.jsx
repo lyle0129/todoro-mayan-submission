@@ -1,115 +1,229 @@
-import React, {useState} from 'react';
-import {useSound} from 'use-sound';
+import { useState, useEffect } from 'react';
+import { useSound } from 'use-sound';
+import { Plus, Trash2, Edit3, Check, Save, Target } from 'lucide-react';
 
-import doneSfx from './music/done.mp3';   // adjust path to your file
+import doneSfx from './music/done.mp3';
 import deleteSfx from './music/delete.mp3';
 
-function Todo(){
-
-    const [tasks, setTasks] = useState(["do laundry","fold clothes"]);
+function Todo() {
+    const [tasks, setTasks] = useState([]);
     const [newTask, setNewTask] = useState("");
     const [accomplishedTasks, setAccomplishedTasks] = useState([]);
 
     const [editingIndex, setEditingIndex] = useState(null);
-    const [editValue, setEditValue] = useState(""); 
+    const [editValue, setEditValue] = useState("");
 
-    // load sounds
-    const [playDone] = useSound(doneSfx, { volume: 0.5 });
-    const [playDelete] = useSound(deleteSfx, { volume: 0.5 });
+    // Load tasks from localStorage on mount
+    useEffect(() => {
+        const savedTasks = localStorage.getItem('todoro-tasks');
+        const savedAccomplished = localStorage.getItem('todoro-accomplished');
 
-    function handleInputChange (event) {
+        if (savedTasks) {
+            try {
+                const parsed = JSON.parse(savedTasks);
+                setTasks(parsed);
+            } catch (e) {
+                console.error('Failed to parse saved tasks');
+            }
+        }
+
+        if (savedAccomplished) {
+            try {
+                const parsed = JSON.parse(savedAccomplished);
+                setAccomplishedTasks(parsed);
+            } catch (e) {
+                console.error('Failed to parse saved accomplished tasks');
+            }
+        }
+    }, []);
+
+    // Save tasks to localStorage whenever they change
+    useEffect(() => {
+        localStorage.setItem('todoro-tasks', JSON.stringify(tasks));
+    }, [tasks]);
+
+    // Save accomplished tasks to localStorage whenever they change
+    useEffect(() => {
+        localStorage.setItem('todoro-accomplished', JSON.stringify(accomplishedTasks));
+    }, [accomplishedTasks]);
+
+    // load sounds with advanced timing
+    const [playDone] = useSound(doneSfx, {
+        volume: 0.5,
+        sprite: {
+            done: [150, 2000] 
+        }
+    });
+    const [playDelete] = useSound(deleteSfx, {
+        volume: 0.5,
+        sprite: {
+            delete: [500, 250] 
+        }
+    });
+
+    function handleInputChange(event) {
         setNewTask(event.target.value);
     }
 
-    function addTask (){
-
-        if (newTask.trim() !== "" ){
-            setTasks( t => [...t, newTask]);
+    function addTask() {
+        if (newTask.trim() !== "") {
+            setTasks(t => [...t, newTask]);
             setNewTask("");
         }
-        
     }
 
-    function deleteTask (index){
-        playDelete(); 
-        const updatedTasks = tasks.filter((_ ,i) => i !== index)
+    function deleteTask(index) {
+        playDelete({ id: 'delete' });
+        const updatedTasks = tasks.filter((_, i) => i !== index)
         setTasks(updatedTasks);
     }
 
-    function completeTask (index){
-        playDone(); 
+    function completeTask(index) {
+        playDone({ id: 'done' });
         const taskCompleted = tasks[index];
-        setAccomplishedTasks(a => [...a, taskCompleted] );
-        const updatedTasks = tasks.filter((_ ,i) => i !== index)
+        setAccomplishedTasks(a => [...a, taskCompleted]);
+        const updatedTasks = tasks.filter((_, i) => i !== index)
         setTasks(updatedTasks);
     }
 
-    
-    return(
-        <>
-        <div className="todo-container">
-            <div className="todo-status">
-                {((accomplishedTasks.length/
-                    (tasks.length+accomplishedTasks.length)) 
-                    * 100).toFixed(2)}% Task Done
-            </div>
-            <div className="task-forms">
-                <input type="text"
-                placeholder="Enter a task"
-                value={newTask}
-                onChange={handleInputChange} />
-                <button
-                className="add-button"
-                onClick={addTask}>➕</button>
-            </div>
-            <div className="tasks">
-                <ol>
-                    {tasks.map((task, index) => (
-                    <li key={index}>
-                        {editingIndex === index ? (
-                        <>
-                            <input className="edit-text"
-                            value={editValue}
-                            onChange={(e) => setEditValue(e.target.value)}
-                            />
-                            <button className="save-button" onClick={() => {
-                            const updatedTasks = [...tasks];
-                            updatedTasks[index] = editValue;
-                            setTasks(updatedTasks);
-                            setEditingIndex(null);
-                            }}>
-                            Save
-                            </button>
-                        </>
-                        ) : (
-                        <>
-                            <span>{task}</span>
-                            <button className="delete-button" onClick={() => deleteTask(index)}>🗑️</button>
-                            <button className="edit-button" onClick={() => {
-                            setEditingIndex(index);
-                            setEditValue(task);
-                            }}>
-                            ✍️
-                            </button>
-                            <button className="done-button" onClick={() => completeTask(index)}>✔️</button>
-                        </>
-                        )}
-                    </li>
-                    ))}
-                </ol>
-            </div>
-            <div className="done-tasks">
-                <h2>Accomplished tasks</h2>
-                <ol>
-                    {accomplishedTasks.map((doneTask, index) => <li key={index} >
-                    <span>{doneTask}</span>
-                    </li>)}
-                </ol>
-            </div>
-        </div>
-        </>
-    )
+    function saveEdit(index) {
+        if (editValue.trim() !== "") {
+            const updatedTasks = [...tasks];
+            updatedTasks[index] = editValue.trim();
+            setTasks(updatedTasks);
+        }
+        setEditingIndex(null);
+    }
 
+    const completionPercentage = ((accomplishedTasks.length / (tasks.length + accomplishedTasks.length)) * 100) || 0;
+
+    return (
+        <div className="todo-container">
+            <div className="todo-header">
+                <div className="progress-section">
+                    <div className="progress-info">
+                        <Target className="progress-icon" />
+                        <span className="progress-text">
+                            {completionPercentage.toFixed(0)}% Complete
+                        </span>
+                    </div>
+                    <div className="progress-bar">
+                        <div
+                            className="progress-fill"
+                            style={{ width: `${completionPercentage}%` }}
+                        ></div>
+                    </div>
+                    <div className="task-count">
+                        {accomplishedTasks.length} of {tasks.length + accomplishedTasks.length} tasks done
+                    </div>
+                </div>
+            </div>
+
+            <div className="task-input-section">
+                <div className="input-group">
+                    <input
+                        type="text"
+                        placeholder="What needs to be done?"
+                        value={newTask}
+                        onChange={handleInputChange}
+                        onKeyDown={(e) => e.key === 'Enter' && addTask()}
+                        className="task-input"
+                    />
+                    <button
+                        className="add-btn"
+                        onClick={addTask}
+                        disabled={!newTask.trim()}
+                    >
+                        <Plus size={20} />
+                    </button>
+                </div>
+            </div>
+
+            <div className="tasks-section">
+                <h3 className="section-title">Active Tasks</h3>
+                <div className="task-list">
+                    {tasks.length === 0 ? (
+                        <div className="empty-state">
+                            <Target size={48} className="empty-icon" />
+                            <p>No active tasks. Add one above!</p>
+                        </div>
+                    ) : (
+                        tasks.map((task, index) => (
+                            <div key={index} className="task-item">
+                                {editingIndex === index ? (
+                                    <div className="edit-mode">
+                                        <input
+                                            className="edit-input"
+                                            value={editValue}
+                                            onChange={(e) => setEditValue(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    saveEdit(index);
+                                                } else if (e.key === 'Escape') {
+                                                    setEditingIndex(null);
+                                                }
+                                            }}
+                                            autoFocus
+                                        />
+                                        <button
+                                            className="action-btn save"
+                                            onClick={() => saveEdit(index)}
+                                        >
+                                            <Save size={16} />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <span className="task-text">{task}</span>
+                                        <div className="task-actions">
+                                            <button
+                                                className="action-btn complete"
+                                                onClick={() => completeTask(index)}
+                                                title="Mark as complete"
+                                            >
+                                                <Check size={16} />
+                                            </button>
+                                            <button
+                                                className="action-btn edit"
+                                                onClick={() => {
+                                                    setEditingIndex(index);
+                                                    setEditValue(task);
+                                                }}
+                                                title="Edit task"
+                                            >
+                                                <Edit3 size={16} />
+                                            </button>
+                                            <button
+                                                className="action-btn delete"
+                                                onClick={() => deleteTask(index)}
+                                                title="Delete task"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        ))
+                    )}
+                </div>
+            </div>
+
+            {accomplishedTasks.length > 0 && (
+                <div className="completed-section">
+                    <h3 className="section-title completed">Completed Tasks</h3>
+                    <div className="completed-list">
+                        {accomplishedTasks.map((doneTask, index) => (
+                            <div key={index} className="completed-item">
+                                <Check size={16} className="completed-icon" />
+                                <span className="completed-text">{doneTask}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
+    )
 }
 
 export default Todo;
