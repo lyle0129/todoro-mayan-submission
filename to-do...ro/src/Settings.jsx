@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings as SettingsIcon, X, Palette, Clock, RotateCcw } from 'lucide-react';
+import { Settings as SettingsIcon, X, Palette, Clock, RotateCcw, BarChart3 } from 'lucide-react';
 
 const THEMES = {
   dark: {
@@ -55,7 +55,9 @@ function Settings({
   shortBreakDuration,
   longBreakDuration,
   longBreakInterval,
-  onDurationChange
+  onDurationChange,
+  heatmapShowNumbers,
+  onHeatmapShowNumbersChange
 }) {
   const [tempSettings, setTempSettings] = useState({
     workDuration: Math.floor(workDuration / 60),
@@ -199,6 +201,32 @@ function Settings({
                     longBreakInterval: parseInt(e.target.value) || 3
                   }))}
                 />
+              </div>
+            </div>
+          </div>
+
+          {/* Heatmap Settings */}
+          <div className="settings-section">
+            <div className="section-header">
+              <BarChart3 size={20} />
+              <h3>Heatmap Display</h3>
+            </div>
+            <div className="heatmap-settings">
+              <div className="setting-toggle">
+                <label className="toggle-label">
+                  <span>Show session numbers in heatmap</span>
+                  <div className="toggle-switch">
+                    <input
+                      type="checkbox"
+                      checked={heatmapShowNumbers}
+                      onChange={(e) => onHeatmapShowNumbersChange(e.target.checked)}
+                    />
+                    <span className="toggle-slider"></span>
+                  </div>
+                </label>
+                <p className="setting-description">
+                  When enabled, shows the number of sessions in each day. When disabled, shows only color intensity.
+                </p>
               </div>
             </div>
           </div>

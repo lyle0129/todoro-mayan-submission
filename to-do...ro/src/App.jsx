@@ -10,6 +10,7 @@ function App() {
   const [currentTheme, setCurrentTheme] = useState('dark');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isTodoVisible, setIsTodoVisible] = useState(true);
+  const [heatmapShowNumbers, setHeatmapShowNumbers] = useState(false);
 
   // Timer settings state
   const [timerSettings, setTimerSettings] = useState({
@@ -24,6 +25,7 @@ function App() {
     const savedTheme = localStorage.getItem('todoro-theme');
     const savedSettings = localStorage.getItem('todoro-settings');
     const savedTodoVisibility = localStorage.getItem('todoro-todo-visible');
+    const savedHeatmapShowNumbers = localStorage.getItem('todoro-heatmap-show-numbers');
 
     if (savedTheme && THEMES[savedTheme]) {
       setCurrentTheme(savedTheme);
@@ -40,6 +42,10 @@ function App() {
 
     if (savedTodoVisibility !== null) {
       setIsTodoVisible(JSON.parse(savedTodoVisibility));
+    }
+
+    if (savedHeatmapShowNumbers !== null) {
+      setHeatmapShowNumbers(JSON.parse(savedHeatmapShowNumbers));
     }
   }, []);
 
@@ -70,6 +76,11 @@ function App() {
     localStorage.setItem('todoro-todo-visible', JSON.stringify(newVisibility));
   };
 
+  const handleHeatmapShowNumbersChange = (showNumbers) => {
+    setHeatmapShowNumbers(showNumbers);
+    localStorage.setItem('todoro-heatmap-show-numbers', JSON.stringify(showNumbers));
+  };
+
   return (
     <div className="app-container">
       <div className="app-header">
@@ -95,6 +106,8 @@ function App() {
           longBreakInterval={timerSettings.longBreakInterval}
           isTodoVisible={isTodoVisible}
           onToggleTodo={toggleTodoVisibility}
+          currentTheme={currentTheme}
+          heatmapShowNumbers={heatmapShowNumbers}
         />
         {isTodoVisible && <Todo />}
       </div>
@@ -109,6 +122,8 @@ function App() {
         longBreakDuration={timerSettings.longBreakDuration}
         longBreakInterval={timerSettings.longBreakInterval}
         onDurationChange={handleDurationChange}
+        heatmapShowNumbers={heatmapShowNumbers}
+        onHeatmapShowNumbersChange={handleHeatmapShowNumbersChange}
       />
     </div>
   )

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useSound } from 'use-sound';
-import { Play, Pause, RotateCcw, Coffee, Clock, Zap, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, SkipForward } from 'lucide-react';
+import { Play, Pause, RotateCcw, Coffee, Clock, Zap, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, SkipForward, BarChart3 } from 'lucide-react';
+import PomodoroHeatmap from './PomodoroHeatmap.jsx';
 
 import doneTimer from './music/pomodone.mp3'
 import yaLikeJazz from './music/jazz.mp3'
@@ -11,12 +12,15 @@ function Pomodoro({
     longBreakDuration = 15 * 60,
     longBreakInterval = 3,
     isTodoVisible = true,
-    onToggleTodo
+    onToggleTodo,
+    currentTheme = 'dark',
+    heatmapShowNumbers = true
 }) {
     const [timeLeft, setTimeLeft] = useState(workDuration);
     const [isRunning, setIsRunning] = useState(false);
     const [isWorkSession, setIsWorkSession] = useState(true);
     const [hasStarted, setHasStarted] = useState(false);
+    const [isHeatmapVisible, setIsHeatmapVisible] = useState(true);
 
     const [pomodoroCount, setPomodoroCount] = useState(0); // completed work sessions
     const [displayCount, setDisplayCount] = useState(1);
@@ -44,6 +48,22 @@ function Pomodoro({
             jazzAudioRef.current = null;
         };
     }, []);
+
+    /* ---------- HEATMAP VISIBILITY ---------- */
+
+    // Load heatmap visibility from localStorage
+    useEffect(() => {
+        const savedHeatmapVisibility = localStorage.getItem('todoro-heatmap-visible');
+        if (savedHeatmapVisibility !== null) {
+            setIsHeatmapVisible(JSON.parse(savedHeatmapVisibility));
+        }
+    }, []);
+
+    const toggleHeatmapVisibility = () => {
+        const newVisibility = !isHeatmapVisible;
+        setIsHeatmapVisible(newVisibility);
+        localStorage.setItem('todoro-heatmap-visible', JSON.stringify(newVisibility));
+    };
 
     /* ---------- DURATION SYNC ---------- */
 
@@ -86,6 +106,11 @@ function Pomodoro({
             setPomodoroCount(completed);
             setIsWorkSession(false);
             setTimeLeft(getBreakDuration(completed));
+            
+            // Add completed pomodoro to heatmap
+            if (window.addPomodoroToHeatmap) {
+                window.addPomodoroToHeatmap();
+            }
         } else {
             setIsWorkSession(true);
             setTimeLeft(workDuration);
@@ -151,6 +176,11 @@ function Pomodoro({
                 setPomodoroCount(completed);
                 setIsWorkSession(false);
                 setTimeLeft(getBreakDuration(completed));
+                
+                // Add completed pomodoro to heatmap
+                if (window.addPomodoroToHeatmap) {
+                    window.addPomodoroToHeatmap();
+                }
             } else {
                 setIsWorkSession(true);
                 setTimeLeft(workDuration);
@@ -300,7 +330,25 @@ function Pomodoro({
                         {isTodoVisible ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                     </span>
                 </button>
+                
+                <button
+                    className="heatmap-toggle-btn"
+                    onClick={toggleHeatmapVisibility}
+                >
+                    <BarChart3 size={16} />
+                    <span className="toggle-text">Heatmap</span>
+                    {isHeatmapVisible ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </button>
             </div>
+
+            {isHeatmapVisible && (
+                <PomodoroHeatmap 
+                    isVisible={isHeatmapVisible}
+                    onToggleVisibility={toggleHeatmapVisibility}
+                    currentTheme={currentTheme}
+                    showNumbers={heatmapShowNumbers}
+                />
+            )}
         </div>
     );
 }
