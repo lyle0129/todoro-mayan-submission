@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings as SettingsIcon, X, Palette, Clock, RotateCcw, BarChart3 } from 'lucide-react';
+import { Settings as SettingsIcon, X, Palette, Clock, RotateCcw, BarChart3, HelpCircle } from 'lucide-react';
 
 const THEMES = {
   dark: {
@@ -57,7 +57,8 @@ function Settings({
   longBreakInterval,
   onDurationChange,
   heatmapShowNumbers,
-  onHeatmapShowNumbersChange
+  onHeatmapShowNumbersChange,
+  onShowInstructions
 }) {
   const [tempSettings, setTempSettings] = useState({
     workDuration: Math.floor(workDuration / 60),
@@ -228,6 +229,23 @@ function Settings({
                   When enabled, shows the number of sessions in each day. When disabled, shows only color intensity.
                 </p>
               </div>
+            </div>
+          </div>
+
+          {/* Help & Tutorial */}
+          <div className="settings-section">
+            <div className="section-header">
+              <HelpCircle size={20} />
+              <h3>Help & Tutorial</h3>
+            </div>
+            <div className="help-settings">
+              <button className="tutorial-btn" onClick={onShowInstructions}>
+                <HelpCircle size={16} />
+                Show Tutorial
+              </button>
+              <p className="setting-description">
+                Replay the onboarding tutorial to learn about all features and how to use To-doRo effectively.
+              </p>
             </div>
           </div>
         </div>

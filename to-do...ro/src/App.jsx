@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Pomodoro from './Pomodoro.jsx'
 import Todo from './Todo.jsx'
 import Settings, { THEMES } from './Settings.jsx'
+import InstructionalModal from './InstructionalModal.jsx'
 import { Settings as SettingsIcon } from 'lucide-react'
 import './App.css'
 
@@ -11,6 +12,8 @@ function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isTodoVisible, setIsTodoVisible] = useState(true);
   const [heatmapShowNumbers, setHeatmapShowNumbers] = useState(false);
+  const [isInstructionsOpen, setIsInstructionsOpen] = useState(false);
+  const [instructionsFromSettings, setInstructionsFromSettings] = useState(false);
 
   // Timer settings state
   const [timerSettings, setTimerSettings] = useState({
@@ -26,6 +29,7 @@ function App() {
     const savedSettings = localStorage.getItem('todoro-settings');
     const savedTodoVisibility = localStorage.getItem('todoro-todo-visible');
     const savedHeatmapShowNumbers = localStorage.getItem('todoro-heatmap-show-numbers');
+    const instructionsSeen = localStorage.getItem('todoro-instructions-seen');
 
     if (savedTheme && THEMES[savedTheme]) {
       setCurrentTheme(savedTheme);
@@ -46,6 +50,11 @@ function App() {
 
     if (savedHeatmapShowNumbers !== null) {
       setHeatmapShowNumbers(JSON.parse(savedHeatmapShowNumbers));
+    }
+
+    // Show instructions on first visit
+    if (!instructionsSeen) {
+      setIsInstructionsOpen(true);
     }
   }, []);
 
@@ -79,6 +88,16 @@ function App() {
   const handleHeatmapShowNumbersChange = (showNumbers) => {
     setHeatmapShowNumbers(showNumbers);
     localStorage.setItem('todoro-heatmap-show-numbers', JSON.stringify(showNumbers));
+  };
+
+  const handleShowInstructions = () => {
+    setInstructionsFromSettings(true);
+    setIsInstructionsOpen(true);
+  };
+
+  const handleCloseInstructions = () => {
+    setIsInstructionsOpen(false);
+    setInstructionsFromSettings(false);
   };
 
   return (
@@ -124,6 +143,13 @@ function App() {
         onDurationChange={handleDurationChange}
         heatmapShowNumbers={heatmapShowNumbers}
         onHeatmapShowNumbersChange={handleHeatmapShowNumbersChange}
+        onShowInstructions={handleShowInstructions}
+      />
+
+      <InstructionalModal
+        isOpen={isInstructionsOpen}
+        onClose={handleCloseInstructions}
+        isFromSettings={instructionsFromSettings}
       />
     </div>
   )

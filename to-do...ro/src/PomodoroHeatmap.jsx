@@ -186,7 +186,7 @@ function PomodoroHeatmap({ isVisible, onToggleVisibility, currentTheme, showNumb
 
         // Download the image
         const link = document.createElement('a');
-        link.download = `pomodoro-heatmap-${heatmapData.weekKey}.png`;
+        link.download = `todoro-heatmap-${heatmapData.weekKey}.png`;
         link.href = canvas.toDataURL();
         link.click();
     };
