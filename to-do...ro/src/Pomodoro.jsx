@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useSound } from 'use-sound';
-import { Play, Pause, RotateCcw, Coffee, Clock, Zap, ChevronRight, ChevronLeft, ChevronUp, ChevronDown } from 'lucide-react';
+import { Play, Pause, RotateCcw, Coffee, Clock, Zap, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, SkipForward } from 'lucide-react';
 
 import doneTimer from './music/pomodone.mp3'
 import yaLikeJazz from './music/jazz.mp3'
@@ -18,7 +18,7 @@ function Pomodoro({
     const [isWorkSession, setIsWorkSession] = useState(true);
     const [hasStarted, setHasStarted] = useState(false);
 
-    const [pomodoroCount, setPomodoroCount] = useState(1);
+    const [pomodoroCount, setPomodoroCount] = useState(0);
     const [displayCount, setDisplayCount] = useState(1);
 
     // Audio refs for better control
@@ -44,7 +44,7 @@ function Pomodoro({
             if (isWorkSession) {
                 setTimeLeft(workDuration);
             } else {
-                const shouldBeLongBreak = pomodoroCount % longBreakInterval === 0;
+                const shouldBeLongBreak = ((pomodoroCount + 1) % longBreakInterval === 0);
                 setTimeLeft(shouldBeLongBreak ? longBreakDuration : shortBreakDuration);
             }
         }
@@ -53,7 +53,8 @@ function Pomodoro({
     // Calculate progress for visual timer
     const getCurrentDuration = () => {
         if (isWorkSession) return workDuration;
-        return pomodoroCount % longBreakInterval === 0 ? longBreakDuration : shortBreakDuration;
+        // For breaks, check if the next completed session would trigger a long break
+        return ((pomodoroCount + 1) % longBreakInterval === 0) ? longBreakDuration : shortBreakDuration;
     };
 
     // For work sessions: show depleting (remaining time)
@@ -61,6 +62,40 @@ function Pomodoro({
     const progress = isWorkSession
         ? (timeLeft / getCurrentDuration()) * 100  // Depleting - shows remaining time
         : ((getCurrentDuration() - timeLeft) / getCurrentDuration()) * 100; // Filling - shows elapsed time
+
+    // Skip session function
+    function skipSession() {
+        // Stop music when session is skipped
+        if (jazzAudioRef.current) {
+            jazzAudioRef.current.pause();
+        }
+
+        if (isWorkSession) {
+            // Increment count to represent completed sessions
+            const newCount = pomodoroCount + 1;
+            setPomodoroCount(newCount);
+
+            // Check if this completed work session should trigger a long break
+            // Long break after sessions 3, 6, 9, etc.
+            if (newCount % longBreakInterval === 0) {
+                setIsWorkSession(false);
+                setTimeLeft(longBreakDuration);
+            } else {
+                setIsWorkSession(false);
+                setTimeLeft(shortBreakDuration);
+            }
+
+            setIsRunning(false);
+            setHasStarted(false);
+        } else {
+            setIsWorkSession(true);
+            setTimeLeft(workDuration);
+            setDisplayCount(pomodoroCount + 1);
+            setIsRunning(false);
+            setHasStarted(false);
+        }
+        playDonePomo();
+    }
 
     // Manual mode buttons
     function setWorkSession() {
@@ -121,23 +156,26 @@ function Pomodoro({
             }
 
             if (isWorkSession) {
+                // Increment count to represent completed sessions
                 const newCount = pomodoroCount + 1;
                 setPomodoroCount(newCount);
 
                 // Check if this completed work session should trigger a long break
-                if (pomodoroCount % longBreakInterval === 0) {
+                // Long break after sessions 3, 6, 9, etc.
+                if (newCount % longBreakInterval === 0) {
                     setIsWorkSession(false);
                     setTimeLeft(longBreakDuration);
                 } else {
                     setIsWorkSession(false);
                     setTimeLeft(shortBreakDuration);
                 }
+
                 setIsRunning(false);
                 setHasStarted(false);
             } else {
                 setIsWorkSession(true);
                 setTimeLeft(workDuration);
-                setDisplayCount(pomodoroCount);
+                setDisplayCount(pomodoroCount + 1);
                 setIsRunning(false);
                 setHasStarted(false);
             }
@@ -238,7 +276,7 @@ function Pomodoro({
                         if (isWorkSession) {
                             setTimeLeft(workDuration);
                         } else {
-                            if (pomodoroCount % longBreakInterval === 0) {
+                            if (((pomodoroCount + 1) % longBreakInterval === 0)) {
                                 setTimeLeft(longBreakDuration);
                             } else {
                                 setTimeLeft(shortBreakDuration);
@@ -249,6 +287,16 @@ function Pomodoro({
                     <RotateCcw size={20} />
                     Reset
                 </button>
+
+                {isRunning && (
+                    <button
+                        className="control-btn skip"
+                        onClick={skipSession}
+                        title={isWorkSession ? "Skip work session" : "Skip break"}
+                    >
+                        <SkipForward size={20} />
+                    </button>
+                )}
             </div>
 
             <div className="session-modes">

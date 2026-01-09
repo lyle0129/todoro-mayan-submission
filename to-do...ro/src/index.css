@@ -223,6 +223,16 @@ body {
   box-shadow: 0 6px 20px rgba(107, 114, 128, 0.4);
 }
 
+.control-btn.skip {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+}
+
+.control-btn.skip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
 .session-modes {
   display: flex;
   gap: 0.5rem;

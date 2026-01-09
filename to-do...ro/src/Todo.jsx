@@ -17,7 +17,7 @@ function Todo() {
     useEffect(() => {
         const today = new Date().toDateString();
         const savedDate = localStorage.getItem('todoro-date');
-        
+
         // Check if it's a new day - if so, clear all tasks
         if (savedDate !== today) {
             localStorage.removeItem('todoro-tasks');
@@ -64,13 +64,13 @@ function Todo() {
     const [playDone] = useSound(doneSfx, {
         volume: 0.5,
         sprite: {
-            done: [150, 2000] 
+            done: [150, 2000]
         }
     });
     const [playDelete] = useSound(deleteSfx, {
         volume: 0.5,
         sprite: {
-            delete: [500, 250] 
+            delete: [500, 250]
         }
     });
 
@@ -137,7 +137,7 @@ function Todo() {
                         {accomplishedTasks.length} of {tasks.length + accomplishedTasks.length} tasks done
                     </div>
                 </div>
-                
+
                 {(tasks.length > 0 || accomplishedTasks.length > 0) && (
                     <button
                         className="clear-all-btn"
