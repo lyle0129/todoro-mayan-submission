@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Settings as SettingsIcon, X, Palette, Clock, RotateCcw, BarChart3, HelpCircle } from 'lucide-react';
+import './Settings.css';
 
 const THEMES = {
   dark: {

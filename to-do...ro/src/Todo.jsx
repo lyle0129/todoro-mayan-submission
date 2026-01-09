@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSound } from 'use-sound';
 import { Plus, Trash2, Edit3, Check, Save, Target, RotateCcw } from 'lucide-react';
+import './Todo.css';
 
 import doneSfx from './music/done.mp3';
 import deleteSfx from './music/delete.mp3';

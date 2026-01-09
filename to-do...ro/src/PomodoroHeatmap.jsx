@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { BarChart3, Download } from 'lucide-react';
+import './PomodoroHeatmap.css';
 
 function PomodoroHeatmap({ isVisible, onToggleVisibility, currentTheme, showNumbers = false }) {
     const [heatmapData, setHeatmapData] = useState({});

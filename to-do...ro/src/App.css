@@ -1,17 +1,249 @@
-#root {
-  width: 100%;
+/* App Layout Styles */
+.app-container {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-/* Remove default Vite styles */
-.logo {
+.app-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: white;
+}
+
+.app-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.app-subtitle {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  font-weight: 300;
+}
+
+.app-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  flex: 1;
+  transition: all 0.3s ease;
+}
+
+/* Header Layout */
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.header-content.centered-header {
+  justify-content: center;
+}
+
+.header-content.centered-header .settings-trigger {
+  position: absolute;
+  right: 0;
+}
+
+.title-section {
+  flex: 1;
+  text-align: center;
+}
+
+.header-content.centered-header .title-section {
+  flex: none;
+}
+
+.settings-trigger {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 12px;
+  padding: 0.75rem;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.settings-trigger:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+/* Todo Toggle Section */
+.todo-toggle-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1.5rem;
+  gap: 1rem;
+}
+
+.todo-toggle-pomodoro {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+}
+
+.todo-toggle-pomodoro:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.todo-toggle-pomodoro .toggle-text {
+  white-space: nowrap;
+}
+
+/* Desktop icons (left/right arrows) */
+.toggle-icon-desktop {
+  display: inline-flex;
+}
+
+/* Mobile icons (up/down arrows) - hidden by default */
+.toggle-icon-mobile {
   display: none;
 }
 
-.card {
-  display: none;
+/* Centered Layout When Todo is Hidden */
+.app-content.centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 200px);
 }
 
-.read-the-docs {
-  display: none;
+.app-content.centered .pomodoro-container {
+  max-width: 600px;
+  width: 100%;
+}
+
+/* Focus Mode Enhancements */
+.app-content.centered .pomodoro-container {
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  transform: scale(1.02);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .app-container {
+    padding: 1rem;
+  }
+
+  .app-content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin: 0 0.5rem;
+  }
+
+  .app-title {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    padding: 0.75rem;
+  }
+
+  .app-content {
+    margin: 0 0.75rem;
+  }
+
+  .app-title {
+    font-size: 2rem;
+  }
+
+  .app-subtitle {
+    font-size: 1rem;
+  }
+
+  .header-content {
+    padding: 0 0.5rem;
+    flex-direction: row;
+    gap: 0;
+    text-align: center;
+  }
+
+  .header-content.centered-header {
+    justify-content: center;
+  }
+
+  .header-content.centered-header .settings-trigger {
+    position: absolute;
+    right: 0.5rem;
+  }
+
+  .todo-toggle-pomodoro {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  /* Switch to up/down arrows on mobile */
+  .toggle-icon-desktop {
+    display: none;
+  }
+
+  .toggle-icon-mobile {
+    display: inline-flex;
+  }
+
+  .title-section {
+    order: 1;
+  }
+
+  /* Centered layout adjustments for mobile */
+  .app-content.centered {
+    min-height: calc(100vh - 250px);
+    margin: 0 1rem;
+  }
+
+  .app-content.centered .pomodoro-container {
+    margin: 0;
+    transform: none;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  }
+}
+
+@media (max-width: 480px) {
+  .app-container {
+    padding: 0.5rem;
+  }
+
+  .app-content {
+    margin: 0 0.5rem;
+  }
+
+  .app-title {
+    font-size: 1.8rem;
+  }
+
+  .header-content {
+    padding: 0 0.25rem;
+  }
+
+  /* Better spacing for very small screens */
+  .app-content.centered {
+    margin: 0 0.75rem;
+    min-height: calc(100vh - 220px);
+  }
 }

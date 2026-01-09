@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { useSound } from 'use-sound';
 import { Play, Pause, RotateCcw, Coffee, Clock, Zap, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, SkipForward, BarChart3 } from 'lucide-react';
 import PomodoroHeatmap from './PomodoroHeatmap.jsx';
+import './Pomodoro.css';
 
 import doneTimer from './music/pomodone.mp3'
 import yaLikeJazz from './music/jazz.mp3'
