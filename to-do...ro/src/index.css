@@ -405,6 +405,9 @@ body {
 .tasks-section {
   flex: 1;
   margin-bottom: 2rem;
+  min-height: 0; /* Allow flex item to shrink */
+  display: flex;
+  flex-direction: column;
 }
 
 .section-title {
@@ -425,6 +428,28 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+/* Custom scrollbar styling */
+.task-list::-webkit-scrollbar, .completed-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.task-list::-webkit-scrollbar-track, .completed-list::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.task-list::-webkit-scrollbar-thumb, .completed-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.task-list::-webkit-scrollbar-thumb:hover, .completed-list::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .task-item {
@@ -540,6 +565,9 @@ body {
 .completed-section {
   border-top: 1px solid #e5e7eb;
   padding-top: 2rem;
+  max-height: 250px;
+  display: flex;
+  flex-direction: column;
 }
 
 .completed-item {
