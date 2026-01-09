@@ -7,6 +7,10 @@
   margin-top: 1rem;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
 }
 
 .heatmap-header {
@@ -219,6 +223,9 @@
   .heatmap-container {
     padding: 1rem;
     margin-top: 0.75rem;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .heatmap-header {
@@ -230,6 +237,7 @@
 
   .heatmap-grid {
     gap: 0.5rem;
+    justify-items: center;
   }
 
   .heatmap-cell {
@@ -245,8 +253,15 @@
 }
 
 @media (max-width: 480px) {
+  .heatmap-container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   .heatmap-grid {
     gap: 0.25rem;
+    justify-items: center;
   }
 
   .heatmap-cell {

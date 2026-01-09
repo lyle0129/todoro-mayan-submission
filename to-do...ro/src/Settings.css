@@ -12,6 +12,7 @@
   justify-content: center;
   z-index: 1000;
   padding: 1rem;
+  box-sizing: border-box;
 }
 
 .settings-modal {
@@ -359,9 +360,17 @@
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+  .settings-overlay {
+    padding: 0.5rem;
+    align-items: flex-start;
+    padding-top: 2rem;
+  }
+
   .settings-modal {
-    margin: 1rem;
-    max-height: calc(100vh - 2rem);
+    margin: 0;
+    max-height: calc(100vh - 4rem);
+    width: 100%;
+    max-width: 100%;
   }
 
   .settings-header,
@@ -401,6 +410,17 @@
 }
 
 @media (max-width: 480px) {
+  .settings-overlay {
+    padding: 0.25rem;
+    padding-top: 1rem;
+  }
+
+  .settings-modal {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+  }
+
   .theme-grid {
     grid-template-columns: 1fr;
   }

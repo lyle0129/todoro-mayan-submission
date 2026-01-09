@@ -12,6 +12,7 @@
   justify-content: center;
   z-index: 1000;
   padding: 20px;
+  box-sizing: border-box;
 }
 
 .instructions-modal {
@@ -236,9 +237,17 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .instructions-overlay {
+    padding: 10px;
+    align-items: flex-start;
+    padding-top: 2rem;
+  }
+
   .instructions-modal {
-    max-width: 95vw;
-    margin: 10px;
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    max-height: calc(100vh - 4rem);
   }
   
   .instruction-step {
@@ -284,6 +293,18 @@
 }
 
 @media (max-width: 480px) {
+  .instructions-overlay {
+    padding: 5px;
+    padding-top: 1rem;
+  }
+
+  .instructions-modal {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    max-height: calc(100vh - 2rem);
+  }
+
   .instructions-header {
     padding: 20px 16px 12px;
   }
