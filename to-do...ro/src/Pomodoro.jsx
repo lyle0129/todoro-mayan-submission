@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useSound } from 'use-sound';
 import { Play, Pause, RotateCcw, Coffee, Clock, Zap, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, SkipForward } from 'lucide-react';
 
@@ -18,95 +18,94 @@ function Pomodoro({
     const [isWorkSession, setIsWorkSession] = useState(true);
     const [hasStarted, setHasStarted] = useState(false);
 
-    const [pomodoroCount, setPomodoroCount] = useState(0);
+    const [pomodoroCount, setPomodoroCount] = useState(0); // completed work sessions
     const [displayCount, setDisplayCount] = useState(1);
 
-    // Audio refs for better control
     const jazzAudioRef = useRef(null);
+    const [playDonePomo] = useSound(doneTimer, { volume: 0.5 });
 
-    // Initialize audio
+    /* ---------- FIXED HELPERS ---------- */
+
+    const isLongBreak = (completed) =>
+        completed !== 0 && completed % longBreakInterval === 0;
+
+    const getBreakDuration = (completed) =>
+        isLongBreak(completed) ? longBreakDuration : shortBreakDuration;
+
+    /* ---------- AUDIO INIT ---------- */
+
     useEffect(() => {
         jazzAudioRef.current = new Audio(yaLikeJazz);
         jazzAudioRef.current.loop = true;
         jazzAudioRef.current.volume = 0.05;
 
         return () => {
-            if (jazzAudioRef.current) {
-                jazzAudioRef.current.pause();
-                jazzAudioRef.current = null;
-            }
+            jazzAudioRef.current?.pause();
+            jazzAudioRef.current = null;
         };
     }, []);
 
-    // Update timeLeft when durations change, but only if timer hasn't been started yet
+    /* ---------- DURATION SYNC ---------- */
+
     useEffect(() => {
         if (!hasStarted) {
-            if (isWorkSession) {
-                setTimeLeft(workDuration);
-            } else {
-                const shouldBeLongBreak = ((pomodoroCount + 1) % longBreakInterval === 0);
-                setTimeLeft(shouldBeLongBreak ? longBreakDuration : shortBreakDuration);
-            }
+            setTimeLeft(
+                isWorkSession
+                    ? workDuration
+                    : getBreakDuration(pomodoroCount)
+            );
         }
-    }, [workDuration, shortBreakDuration, longBreakDuration, longBreakInterval, isWorkSession, pomodoroCount, hasStarted]);
+    }, [
+        hasStarted,
+        isWorkSession,
+        pomodoroCount,
+        workDuration,
+        shortBreakDuration,
+        longBreakDuration
+    ]);
 
-    // Calculate progress for visual timer
-    const getCurrentDuration = () => {
-        if (isWorkSession) return workDuration;
-        // For breaks, check if the next completed session would trigger a long break
-        return ((pomodoroCount + 1) % longBreakInterval === 0) ? longBreakDuration : shortBreakDuration;
-    };
+    /* ---------- PROGRESS ---------- */
 
-    // For work sessions: show depleting (remaining time)
-    // For breaks: show filling (elapsed time)
+    const getCurrentDuration = useMemo(() => {
+        return isWorkSession
+            ? workDuration
+            : getBreakDuration(pomodoroCount);
+    }, [isWorkSession, workDuration, pomodoroCount]);
+
     const progress = isWorkSession
-        ? (timeLeft / getCurrentDuration()) * 100  // Depleting - shows remaining time
-        : ((getCurrentDuration() - timeLeft) / getCurrentDuration()) * 100; // Filling - shows elapsed time
+        ? (timeLeft / getCurrentDuration) * 100
+        : ((getCurrentDuration - timeLeft) / getCurrentDuration) * 100;
 
-    // Skip session function
+    /* ---------- SKIP SESSION ---------- */
+
     function skipSession() {
-        // Stop music when session is skipped
-        if (jazzAudioRef.current) {
-            jazzAudioRef.current.pause();
-        }
+        jazzAudioRef.current?.pause();
 
         if (isWorkSession) {
-            // Increment count to represent completed sessions
-            const newCount = pomodoroCount + 1;
-            setPomodoroCount(newCount);
-
-            // Check if this completed work session should trigger a long break
-            // Long break after sessions 3, 6, 9, etc.
-            if (newCount % longBreakInterval === 0) {
-                setIsWorkSession(false);
-                setTimeLeft(longBreakDuration);
-            } else {
-                setIsWorkSession(false);
-                setTimeLeft(shortBreakDuration);
-            }
-
-            setIsRunning(false);
-            setHasStarted(false);
+            const completed = pomodoroCount + 1;
+            setPomodoroCount(completed);
+            setIsWorkSession(false);
+            setTimeLeft(getBreakDuration(completed));
         } else {
             setIsWorkSession(true);
             setTimeLeft(workDuration);
             setDisplayCount(pomodoroCount + 1);
-            setIsRunning(false);
-            setHasStarted(false);
         }
+
+        setIsRunning(false);
+        setHasStarted(false);
         playDonePomo();
     }
 
-    // Manual mode buttons
+    /* ---------- MANUAL MODES ---------- */
+
     function setWorkSession() {
         setIsWorkSession(true);
         setTimeLeft(workDuration);
         setIsRunning(false);
         setHasStarted(false);
-        if (jazzAudioRef.current) {
-            jazzAudioRef.current.pause();
-            jazzAudioRef.current.currentTime = 0;
-        }
+        jazzAudioRef.current?.pause();
+        jazzAudioRef.current.currentTime = 0;
     }
 
     function setShortBreakSession() {
@@ -114,9 +113,7 @@ function Pomodoro({
         setTimeLeft(shortBreakDuration);
         setIsRunning(false);
         setHasStarted(false);
-        if (jazzAudioRef.current) {
-            jazzAudioRef.current.pause();
-        }
+        jazzAudioRef.current?.pause();
     }
 
     function setLongBreakSession() {
@@ -124,87 +121,63 @@ function Pomodoro({
         setTimeLeft(longBreakDuration);
         setIsRunning(false);
         setHasStarted(false);
-        if (jazzAudioRef.current) {
-            jazzAudioRef.current.pause();
-        }
+        jazzAudioRef.current?.pause();
     }
 
-    const [playDonePomo] = useSound(doneTimer, { volume: 0.5 });
+    /* ---------- FORMAT ---------- */
 
-    // Format seconds -> MM:SS
     const formatTime = (seconds) => {
-        const m = Math.floor(seconds / 60)
-            .toString()
-            .padStart(2, "0");
+        const m = Math.floor(seconds / 60).toString().padStart(2, "0");
         const s = (seconds % 60).toString().padStart(2, "0");
         return `${m}:${s}`;
     };
 
-    // Timer logic
+    /* ---------- TIMER ---------- */
+
     useEffect(() => {
         let timer = null;
 
         if (isRunning && timeLeft > 0) {
             timer = setInterval(() => {
-                setTimeLeft((prev) => prev - 1);
+                setTimeLeft(t => t - 1);
             }, 1000);
+        }
 
-        } else if (timeLeft === 0) {
-            // Stop music when session ends
-            if (jazzAudioRef.current) {
-                jazzAudioRef.current.pause();
-            }
+        if (timeLeft === 0) {
+            jazzAudioRef.current?.pause();
 
             if (isWorkSession) {
-                // Increment count to represent completed sessions
-                const newCount = pomodoroCount + 1;
-                setPomodoroCount(newCount);
-
-                // Check if this completed work session should trigger a long break
-                // Long break after sessions 3, 6, 9, etc.
-                if (newCount % longBreakInterval === 0) {
-                    setIsWorkSession(false);
-                    setTimeLeft(longBreakDuration);
-                } else {
-                    setIsWorkSession(false);
-                    setTimeLeft(shortBreakDuration);
-                }
-
-                setIsRunning(false);
-                setHasStarted(false);
+                const completed = pomodoroCount + 1;
+                setPomodoroCount(completed);
+                setIsWorkSession(false);
+                setTimeLeft(getBreakDuration(completed));
             } else {
                 setIsWorkSession(true);
                 setTimeLeft(workDuration);
                 setDisplayCount(pomodoroCount + 1);
-                setIsRunning(false);
-                setHasStarted(false);
             }
+
+            setIsRunning(false);
+            setHasStarted(false);
             playDonePomo();
         }
 
-        return () => {
-            clearInterval(timer);
-        };
-    }, [isRunning, timeLeft, isWorkSession, longBreakDuration, shortBreakDuration, workDuration, longBreakInterval, pomodoroCount, playDonePomo]);
+        return () => clearInterval(timer);
+    }, [isRunning, timeLeft, isWorkSession, pomodoroCount]);
 
-    // Music playback control with pause/resume functionality
+    /* ---------- MUSIC ---------- */
+
     useEffect(() => {
-        if (isRunning && isWorkSession && jazzAudioRef.current) {
-            // Start or resume music
-            const playPromise = jazzAudioRef.current.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    console.log("Audio play failed:", error);
-                });
-            }
-        } else if (jazzAudioRef.current && isWorkSession) {
-            // Pause music (maintains current position)
-            jazzAudioRef.current.pause();
-        } else if (jazzAudioRef.current && !isWorkSession) {
-            // Stop music completely for breaks
+        if (!jazzAudioRef.current) return;
+
+        if (isRunning && isWorkSession) {
+            jazzAudioRef.current.play().catch(() => {});
+        } else {
             jazzAudioRef.current.pause();
         }
     }, [isRunning, isWorkSession]);
+
+    /* ---------- JSX ---------- */
 
     return (
         <div className="pomodoro-container">
@@ -255,9 +228,7 @@ function Pomodoro({
                     className={`control-btn primary ${isRunning ? 'running' : ''}`}
                     onClick={() => {
                         setIsRunning(!isRunning);
-                        if (!isRunning) {
-                            setHasStarted(true); // Mark as started when play is pressed
-                        }
+                        if (!isRunning) setHasStarted(true);
                     }}
                 >
                     {isRunning ? <Pause size={20} /> : <Play size={20} />}
@@ -269,19 +240,13 @@ function Pomodoro({
                     onClick={() => {
                         setIsRunning(false);
                         setHasStarted(false);
-                        if (jazzAudioRef.current) {
-                            jazzAudioRef.current.pause();
-                            jazzAudioRef.current.currentTime = 0; // Reset music to beginning
-                        }
-                        if (isWorkSession) {
-                            setTimeLeft(workDuration);
-                        } else {
-                            if (((pomodoroCount + 1) % longBreakInterval === 0)) {
-                                setTimeLeft(longBreakDuration);
-                            } else {
-                                setTimeLeft(shortBreakDuration);
-                            }
-                        }
+                        jazzAudioRef.current?.pause();
+                        jazzAudioRef.current.currentTime = 0;
+                        setTimeLeft(
+                            isWorkSession
+                                ? workDuration
+                                : getBreakDuration(pomodoroCount)
+                        );
                     }}
                 >
                     <RotateCcw size={20} />
@@ -292,7 +257,6 @@ function Pomodoro({
                     <button
                         className="control-btn skip"
                         onClick={skipSession}
-                        title={isWorkSession ? "Skip work session" : "Skip break"}
                     >
                         <SkipForward size={20} />
                     </button>
@@ -327,7 +291,6 @@ function Pomodoro({
                 <button
                     className="todo-toggle-pomodoro"
                     onClick={onToggleTodo}
-                    title={isTodoVisible ? "Hide Tasks" : "Show Tasks"}
                 >
                     <span className="toggle-text">Tasks</span>
                     <span className="toggle-icon-desktop">
@@ -339,7 +302,7 @@ function Pomodoro({
                 </button>
             </div>
         </div>
-    )
+    );
 }
 
 export default Pomodoro;
