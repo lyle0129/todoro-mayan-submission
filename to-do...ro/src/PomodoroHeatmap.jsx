@@ -6,19 +6,27 @@ function PomodoroHeatmap({ isVisible, onToggleVisibility, currentTheme, showNumb
     const [heatmapData, setHeatmapData] = useState({});
     const canvasRef = useRef(null);
 
-    // Get current week's Monday as the key
+    // Get current week's Monday as the key (using local time)
     const getCurrentWeekKey = () => {
         const now = new Date();
         const dayOfWeek = now.getDay();
         const monday = new Date(now);
         monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
         monday.setHours(0, 0, 0, 0);
-        return monday.toISOString().split('T')[0];
+        // Use local date instead of UTC to avoid timezone issues
+        const year = monday.getFullYear();
+        const month = String(monday.getMonth() + 1).padStart(2, '0');
+        const day = String(monday.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     };
 
-    // Get current date key
+    // Get current date key (using local time)
     const getCurrentDateKey = () => {
-        return new Date().toISOString().split('T')[0];
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     };
 
     // Load heatmap data from localStorage
@@ -80,17 +88,24 @@ function PomodoroHeatmap({ isVisible, onToggleVisibility, currentTheme, showNumb
     // Generate week days for current week
     const getWeekDays = () => {
         const currentWeek = getCurrentWeekKey();
-        const monday = new Date(currentWeek);
+        const monday = new Date(currentWeek + 'T00:00:00'); // Add time to avoid timezone issues
         const days = [];
+        const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
         for (let i = 0; i < 7; i++) {
             const day = new Date(monday);
             day.setDate(monday.getDate() + i);
+            // Use local date formatting to avoid timezone conversion
+            const year = day.getFullYear();
+            const month = String(day.getMonth() + 1).padStart(2, '0');
+            const dayNum = String(day.getDate()).padStart(2, '0');
+            const dateKey = `${year}-${month}-${dayNum}`;
+
             days.push({
-                date: day.toISOString().split('T')[0],
-                dayName: day.toLocaleDateString('en-US', { weekday: 'short' }),
+                date: dateKey,
+                dayName: dayNames[i],
                 dayNumber: day.getDate(),
-                sessions: heatmapData.sessions?.[day.toISOString().split('T')[0]] || 0
+                sessions: heatmapData.sessions?.[dateKey] || 0
             });
         }
 
