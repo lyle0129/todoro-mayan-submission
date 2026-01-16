@@ -317,11 +317,23 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid #f3f4f6;
   transition: all 0.3s ease;
+  cursor: grab;
 }
 
 .task-item:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.task-item.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+  transform: scale(0.98);
+}
+
+.task-item.drag-over {
+  border-top: 3px solid var(--theme-primary);
+  padding-top: calc(1rem - 2px);
 }
 
 .task-text {

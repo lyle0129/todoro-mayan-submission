@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import Pomodoro from './Pomodoro.jsx'
-import Todo from './Todo.jsx'
-import Settings, { THEMES } from './Settings.jsx'
+import Pomodoro from './components/pomodoro/Pomodoro.jsx'
+import Todo from './components/todo/Todo.jsx'
+import Settings, { THEMES } from './components/pomodoro/Settings.jsx'
 import InstructionalModal from './InstructionalModal.jsx'
 import { Settings as SettingsIcon } from 'lucide-react'
 import './App.css'

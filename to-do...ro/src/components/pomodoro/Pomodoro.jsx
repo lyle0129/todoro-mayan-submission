@@ -4,8 +4,8 @@ import { Play, Pause, RotateCcw, Coffee, Clock, Zap, ChevronRight, ChevronLeft, 
 import PomodoroHeatmap from './PomodoroHeatmap.jsx';
 import './Pomodoro.css';
 
-import doneTimer from './music/pomodone.mp3'
-import yaLikeJazz from './music/jazz.mp3'
+import doneTimer from '../../music/pomodone.mp3'
+import yaLikeJazz from '../../music/jazz.mp3'
 
 function Pomodoro({
     workDuration = 25 * 60,

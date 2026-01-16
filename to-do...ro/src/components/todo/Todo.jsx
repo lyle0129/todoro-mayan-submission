@@ -4,8 +4,8 @@ import { Plus, Trash2, Edit3, Check, Save, Target, RotateCcw, ChevronRight, Chev
 import TaskFilter from './TaskFilter.jsx';
 import './Todo.css';
 
-import doneSfx from './music/done.mp3';
-import deleteSfx from './music/delete.mp3';
+import doneSfx from '../../music/done.mp3';
+import deleteSfx from '../../music/delete.mp3';
 
 function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
     const [tasks, setTasks] = useState([]);
@@ -19,6 +19,9 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
 
     const [isActiveExpanded, setIsActiveExpanded] = useState(true);
     const [isCompletedExpanded, setIsCompletedExpanded] = useState(true);
+
+    const [draggedIndex, setDraggedIndex] = useState(null);
+    const [draggedOverIndex, setDraggedOverIndex] = useState(null);
 
     // Load tasks from localStorage on mount
     useEffect(() => {
@@ -140,6 +143,30 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
         localStorage.removeItem('todoro-accomplished');
     }
 
+    function handleDragStart(index) {
+        setDraggedIndex(index);
+    }
+
+    function handleDragOver(e, index) {
+        e.preventDefault();
+        setDraggedOverIndex(index);
+    }
+
+    function handleDragEnd() {
+        if (draggedIndex !== null && draggedOverIndex !== null && draggedIndex !== draggedOverIndex) {
+            const updatedTasks = [...tasks];
+            const [draggedTask] = updatedTasks.splice(draggedIndex, 1);
+            updatedTasks.splice(draggedOverIndex, 0, draggedTask);
+            setTasks(updatedTasks);
+        }
+        setDraggedIndex(null);
+        setDraggedOverIndex(null);
+    }
+
+    function handleDragLeave() {
+        setDraggedOverIndex(null);
+    }
+
     const completionPercentage = ((accomplishedTasks.length / (tasks.length + accomplishedTasks.length)) * 100) || 0;
 
     // Search logic
@@ -245,7 +272,15 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
                         displayedActiveTasks.map((task) => {
                             const originalIndex = tasks.indexOf(task);
                             return (
-                                <div key={originalIndex} className="task-item">
+                                <div
+                                    key={originalIndex}
+                                    className={`task-item ${draggedIndex === originalIndex ? 'dragging' : ''} ${draggedOverIndex === originalIndex ? 'drag-over' : ''}`}
+                                    draggable={!searchTerm && editingIndex !== originalIndex}
+                                    onDragStart={() => handleDragStart(originalIndex)}
+                                    onDragOver={(e) => handleDragOver(e, originalIndex)}
+                                    onDragEnd={handleDragEnd}
+                                    onDragLeave={handleDragLeave}
+                                >
                                     {editingIndex === originalIndex ? (
                                         <div className="edit-mode">
                                             <input
