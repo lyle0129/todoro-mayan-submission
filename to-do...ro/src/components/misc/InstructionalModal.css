@@ -121,6 +121,13 @@
   border-radius: 12px;
 }
 
+.instruction-image video {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
 .instruction-text {
   flex: 1;
   display: flex;

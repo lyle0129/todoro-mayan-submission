@@ -53,7 +53,7 @@ function App() {
     }
 
     // Show instructions on first visit
-    if (!instructionsSeen) {
+    if (instructionsSeen === null) {
       setIsInstructionsOpen(true);
     }
   }, []);
