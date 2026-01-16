@@ -14,8 +14,9 @@ function InstructionalModal({ isOpen, onClose, isFromSettings = false }) {
     // Determine if the media is a video or image
     const getMediaType = (mediaPath) => {
         if (!mediaPath) return null;
-        const extension = mediaPath.split('.').pop().toLowerCase();
-        return ['mp4', 'webm', 'ogg'].includes(extension) ? 'video' : 'image';
+        // Check if the path contains video extensions
+        const pathStr = typeof mediaPath === 'string' ? mediaPath : String(mediaPath);
+        return pathStr.match(/\.(mp4|webm|ogg)(\?|$)/i) ? 'video' : 'image';
     };
 
     // Handle media load errors
@@ -86,6 +87,7 @@ function InstructionalModal({ isOpen, onClose, isFromSettings = false }) {
                             <div className="instruction-image">
                                 {getMediaType(currentInstruction.image) === 'video' ? (
                                     <video
+                                        key={`video-${currentStep}`}
                                         src={currentInstruction.image}
                                         autoPlay
                                         loop
