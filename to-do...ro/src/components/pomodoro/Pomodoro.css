@@ -9,12 +9,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 600px;
+  justify-content: flex-start;
+  height: 900px;
+  max-height: 900px;
   transition: all 0.3s ease;
   width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .pomodoro-header {
@@ -208,10 +210,13 @@
   .pomodoro-container {
     padding: 1.5rem;
     border-radius: 20px;
+    height: auto;
+    max-height: none;
     min-height: auto;
     margin: 0 auto;
     width: 100%;
     max-width: 100%;
+    overflow: visible;
   }
 
   .timer-text {
@@ -268,6 +273,9 @@
   .pomodoro-container {
     padding: 1rem;
     border-radius: 16px;
+    height: auto;
+    max-height: none;
+    min-height: auto;
     margin: 0 auto;
     width: 100%;
     max-width: 100%;

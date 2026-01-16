@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSound } from 'use-sound';
-import { Plus, Trash2, Edit3, Check, Save, Target, RotateCcw, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, X, Undo2 } from 'lucide-react';
-import TaskFilter from './TaskFilter.jsx';
+import { Plus, Trash2, Edit3, Check, Save, Target, RotateCcw, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, X, Undo2, Search } from 'lucide-react';
 import './Todo.css';
 
 import doneSfx from '../../music/done.mp3';
@@ -16,6 +15,8 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
     const [editValue, setEditValue] = useState("");
 
     const [searchTerm, setSearchTerm] = useState("");
+    const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+    const [showAddTask, setShowAddTask] = useState(false);
 
     const [isActiveExpanded, setIsActiveExpanded] = useState(true);
     const [isCompletedExpanded, setIsCompletedExpanded] = useState(true);
@@ -94,6 +95,7 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
         if (newTask.trim() !== "") {
             setTasks(t => [...t, newTask]);
             setNewTask("");
+            setShowAddTask(false);
         }
     }
 
@@ -226,73 +228,118 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
                     </div>
                 </div>
 
-                <div className="header-actions">
-                    <button
-                        className="pomodoro-toggle-btn"
-                        onClick={onTogglePomodoro}
-                        title={isPomodoroVisible ? "Hide Timer" : "Show Timer"}
-                    >
-                        <span className="toggle-text">Timer</span>
-                        <span className="toggle-icon-desktop">
-                            {isPomodoroVisible ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-                        </span>
-                        <span className="toggle-icon-mobile">
-                            {isPomodoroVisible ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-                        </span>
-                    </button>
-
-                    {(tasks.length > 0 || accomplishedTasks.length > 0) && (
+                <div className="search-section">
+                    <div className={`search-wrapper ${isSearchExpanded ? 'expanded' : ''}`}>
                         <button
-                            className="clear-all-btn"
-                            onClick={clearAllTasks}
-                            title="Clear all tasks"
+                            className="search-toggle-btn"
+                            onClick={() => setIsSearchExpanded(!isSearchExpanded)}
+                            title="Search tasks"
                         >
-                            <RotateCcw size={16} />
-                            Clear All
+                            <Search size={20} />
                         </button>
-                    )}
+                        <input
+                            type="text"
+                            placeholder="Search tasks..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="search-input"
+                            onBlur={() => {
+                                if (!searchTerm) setIsSearchExpanded(false);
+                            }}
+                        />
+                        {searchTerm && (
+                            <button
+                                className="clear-search-btn"
+                                onClick={() => {
+                                    setSearchTerm("");
+                                    setIsSearchExpanded(false);
+                                }}
+                                title="Clear search"
+                            >
+                                <X size={16} />
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
-
-            <div className="task-input-section">
-                <div className="input-group">
-                    <input
-                        type="text"
-                        placeholder="What needs to be done?"
-                        value={newTask}
-                        onChange={handleInputChange}
-                        onKeyDown={(e) => e.key === 'Enter' && addTask()}
-                        className="task-input"
-                    />
-                    <button
-                        className="add-btn"
-                        onClick={addTask}
-                        disabled={!newTask.trim()}
-                    >
-                        <Plus size={20} />
-                    </button>
-                </div>
-            </div>
-
-            <TaskFilter
-                onSearchChange={setSearchTerm}
-            />
 
             <div className="tasks-section">
-                <div className="section-header" onClick={() => setIsActiveExpanded(!isActiveExpanded)}>
-                    <h3 className="section-title">
-                        Active Tasks
-                        <span className="task-badge">{displayedActiveTasks.length}</span>
-                    </h3>
-                    <button className="accordion-toggle" title={isActiveExpanded ? "Collapse" : "Expand"}>
-                        {isActiveExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                    </button>
+                <div className="section-header">
+                    <div className="section-header-left" onClick={() => setIsActiveExpanded(!isActiveExpanded)}>
+                        <h3 className="section-title">
+                            Active Tasks
+                            <span className="task-badge">{displayedActiveTasks.length}</span>
+                        </h3>
+                    </div>
+                    <div className="section-header-actions">
+x                        {!showAddTask && isActiveExpanded && (
+                            <button
+                                className="add-task-header-btn"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowAddTask(true);
+                                }}
+                                title="Add new task"
+                            >
+                                <Plus size={18} />
+                            </button>
+                        )}
+                        <button
+                            className="accordion-toggle"
+                            onClick={() => {
+                                setIsActiveExpanded(!isActiveExpanded);
+                                if (isActiveExpanded) {
+                                    setShowAddTask(false);
+                                    setNewTask("");
+                                }
+                            }}
+                            title={isActiveExpanded ? "Collapse" : "Expand"}
+                        >
+                            {isActiveExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                        </button>
+                    </div>
                 </div>
                 <div className={`task-list ${isActiveExpanded ? 'expanded' : 'collapsed'}`}>
-                    {displayedActiveTasks.length === 0 ? (
+                    {showAddTask && isActiveExpanded && (
+                        <div className="task-input-inline">
+                            <input
+                                type="text"
+                                placeholder="What needs to be done?"
+                                value={newTask}
+                                onChange={handleInputChange}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') addTask();
+                                    if (e.key === 'Escape') {
+                                        setShowAddTask(false);
+                                        setNewTask("");
+                                    }
+                                }}
+                                className="task-input-field"
+                                autoFocus
+                            />
+                            <button
+                                className="add-btn-inline"
+                                onClick={addTask}
+                                disabled={!newTask.trim()}
+                            >
+                                <Plus size={20} />
+                            </button>
+                            <button
+                                className="cancel-btn-inline"
+                                onClick={() => {
+                                    setShowAddTask(false);
+                                    setNewTask("");
+                                }}
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                    )}
+
+                    {displayedActiveTasks.length === 0 && !showAddTask ? (
                         <div className="empty-state">
                             <Target size={48} className="empty-icon" />
-                            <p>{searchTerm ? 'No matching tasks' : 'No active tasks. Add one above!'}</p>
+                            <p>{searchTerm ? 'No matching tasks' : 'No active tasks. Click "Add Task" to get started!'}</p>
                         </div>
                     ) : (
                         displayedActiveTasks.map((task) => {
@@ -384,7 +431,7 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
                                 title="Delete all completed tasks"
                             >
                                 <Trash2 size={16} />
-                                Clear Completed
+                                <span>Clear Completed</span>
                             </button>
                             <button className="accordion-toggle" title={isCompletedExpanded ? "Collapse" : "Expand"}>
                                 {isCompletedExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
@@ -419,7 +466,7 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
                                             onClick={() => deleteAccomplishedTask(originalIndex)}
                                             title="Delete task"
                                         >
-                                            <X size={16} />
+                                            <Trash2 size={16} />
                                         </button>
                                     </div>
                                 </div>
@@ -428,6 +475,33 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
                     </div>
                 </div>
             )}
+
+            <div className="footer-actions">
+                <button
+                    className="pomodoro-toggle-btn"
+                    onClick={onTogglePomodoro}
+                    title={isPomodoroVisible ? "Hide Timer" : "Show Timer"}
+                >
+                    <span className="toggle-text">Timer</span>
+                    <span className="toggle-icon-desktop">
+                        {isPomodoroVisible ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+                    </span>
+                    <span className="toggle-icon-mobile">
+                        {isPomodoroVisible ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+                    </span>
+                </button>
+
+                {(tasks.length > 0 || accomplishedTasks.length > 0) && (
+                    <button
+                        className="clear-all-btn"
+                        onClick={clearAllTasks}
+                        title="Clear all tasks"
+                    >
+                        <RotateCcw size={16} />
+                        Clear All
+                    </button>
+                )}
+            </div>
         </div>
     )
 }
