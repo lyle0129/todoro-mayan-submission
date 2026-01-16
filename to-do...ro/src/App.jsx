@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import Pomodoro from './components/pomodoro/Pomodoro.jsx'
 import Todo from './components/todo/Todo.jsx'
-import Settings, { THEMES } from './components/pomodoro/Settings.jsx'
-import InstructionalModal from './InstructionalModal.jsx'
+import Settings, { THEMES } from './components/misc/Settings.jsx'
+import InstructionalModal from './components/misc/InstructionalModal.jsx'
 import { Settings as SettingsIcon } from 'lucide-react'
 import './App.css'
 
@@ -10,7 +10,7 @@ function App() {
   // Theme state
   const [currentTheme, setCurrentTheme] = useState('dark');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isPomodoroVisible, setIsPomodoroVisible] = useState(true);
+  const [isPomodoroVisible, setIsPomodoroVisible] = useState(false);
   const [heatmapShowNumbers, setHeatmapShowNumbers] = useState(false);
   const [isInstructionsOpen, setIsInstructionsOpen] = useState(false);
   const [instructionsFromSettings, setInstructionsFromSettings] = useState(false);

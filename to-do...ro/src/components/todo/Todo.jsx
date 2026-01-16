@@ -395,8 +395,8 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
                         {displayedCompletedTasks.map((doneTask) => {
                             const originalIndex = accomplishedTasks.indexOf(doneTask);
                             return (
-                                <div 
-                                    key={originalIndex} 
+                                <div
+                                    key={originalIndex}
                                     className={`completed-item ${draggedCompletedIndex === originalIndex ? 'dragging' : ''} ${draggedOverCompletedIndex === originalIndex ? 'drag-over' : ''}`}
                                     draggable={!searchTerm}
                                     onDragStart={() => handleCompletedDragStart(originalIndex)}
