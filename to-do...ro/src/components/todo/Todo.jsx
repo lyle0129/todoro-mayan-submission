@@ -15,7 +15,6 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
     const [editValue, setEditValue] = useState("");
 
     const [searchTerm, setSearchTerm] = useState("");
-    const [isSearchExpanded, setIsSearchExpanded] = useState(false);
     const [showAddTask, setShowAddTask] = useState(false);
 
     const [isActiveExpanded, setIsActiveExpanded] = useState(true);
@@ -229,31 +228,19 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
                 </div>
 
                 <div className="search-section">
-                    <div className={`search-wrapper ${isSearchExpanded ? 'expanded' : ''}`}>
-                        <button
-                            className="search-toggle-btn"
-                            onClick={() => setIsSearchExpanded(!isSearchExpanded)}
-                            title="Search tasks"
-                        >
-                            <Search size={20} />
-                        </button>
+                    <div className="search-wrapper">
+                        <Search size={20} className="search-icon" />
                         <input
                             type="text"
                             placeholder="Search tasks..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="search-input"
-                            onBlur={() => {
-                                if (!searchTerm) setIsSearchExpanded(false);
-                            }}
                         />
                         {searchTerm && (
                             <button
                                 className="clear-search-btn"
-                                onClick={() => {
-                                    setSearchTerm("");
-                                    setIsSearchExpanded(false);
-                                }}
+                                onClick={() => setSearchTerm("")}
                                 title="Clear search"
                             >
                                 <X size={16} />
@@ -339,11 +326,15 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
                     {displayedActiveTasks.length === 0 && !showAddTask ? (
                         <div className="empty-state">
                             <Target size={48} className="empty-icon" />
-                            <p>{searchTerm ? 'No matching tasks' : 'No active tasks. Click "Add Task" to get started!'}</p>
+                            <p>{searchTerm ? 'No matching tasks' : 'No active tasks. Click the + icon to get started!'}</p>
                         </div>
                     ) : (
-                        displayedActiveTasks.map((task) => {
-                            const originalIndex = tasks.indexOf(task);
+                        tasks.map((task, originalIndex) => {
+                            // Skip tasks that don't match the search filter
+                            if (!task.toLowerCase().includes(searchTerm.toLowerCase())) {
+                                return null;
+                            }
+
                             return (
                                 <div
                                     key={originalIndex}
@@ -440,8 +431,12 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
                         </div>
                     </div>
                     <div className={`completed-list ${isCompletedExpanded ? 'expanded' : 'collapsed'}`}>
-                        {displayedCompletedTasks.map((doneTask) => {
-                            const originalIndex = accomplishedTasks.indexOf(doneTask);
+                        {accomplishedTasks.map((doneTask, originalIndex) => {
+                            // Skip tasks that don't match the search filter
+                            if (!doneTask.toLowerCase().includes(searchTerm.toLowerCase())) {
+                                return null;
+                            }
+
                             return (
                                 <div
                                     key={originalIndex}

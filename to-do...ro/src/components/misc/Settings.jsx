@@ -256,10 +256,12 @@ function Settings({
         </div>
 
         <div className="settings-footer">
-          <button className="reset-btn" onClick={handleReset}>
-            <RotateCcw size={16} />
-            Reset to Defaults
-          </button>
+          <div className="footer-left">
+            <button className="reset-btn" onClick={handleReset}>
+              <RotateCcw size={16} />
+              Reset to Defaults
+            </button>
+          </div>
           <div className="footer-actions">
             <button className="cancel-btn" onClick={onClose}>
               Cancel
