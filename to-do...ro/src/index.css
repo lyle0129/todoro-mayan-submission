@@ -11,8 +11,25 @@ body {
   min-height: 100vh;
   color: #1f2937;
   line-height: 1.6;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   /* Mobile safe area support */
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* Premium typography for headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Button and input premium styling */
+button, input, textarea, select {
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.01em;
 }
 
 /* CSS VARIABLES FOR THEMES */

@@ -76,7 +76,7 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
     const [playDone] = useSound(doneSfx, {
         volume: 0.5,
         sprite: {
-            done: [150, 2000]
+            done: [950, 2000]
         }
     });
     const [playDelete] = useSound(deleteSfx, {
