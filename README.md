@@ -15,7 +15,7 @@ ______________________________________________________________________________
 
 🚀 Live Demo
 
-👉 [Check out To-doro here](https://to-doro.vercel.app/)
+👉 [Check out To-doro here](https://todoro-mayan-submission.vercel.app/)
 
 ** Note: I sincerely hope you just clone the repo and run the app locally instead 
 if you plan on using it for long time because I might deplete my vercel limits
