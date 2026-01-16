@@ -19,7 +19,7 @@ function Pomodoro({
     const [isRunning, setIsRunning] = useState(false);
     const [isWorkSession, setIsWorkSession] = useState(true);
     const [hasStarted, setHasStarted] = useState(false);
-    const [isHeatmapVisible, setIsHeatmapVisible] = useState(true);
+    const [isHeatmapVisible, setIsHeatmapVisible] = useState(false);
 
     const [pomodoroCount, setPomodoroCount] = useState(0); // completed work sessions
     const [displayCount, setDisplayCount] = useState(1);
