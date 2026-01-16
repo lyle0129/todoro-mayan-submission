@@ -103,6 +103,31 @@
   min-height: 300px;
 }
 
+/* Special layout for video-above (Toggle Pomodoro step) */
+.instruction-step.video-above {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 20px;
+}
+
+.instruction-step.video-above .instruction-image {
+  width: 100%;
+  max-width: 100%;
+  flex: none;
+  padding: 0;
+  background: transparent;
+}
+
+.instruction-step.video-above .instruction-image video {
+  width: 100%;
+  max-height: 350px;
+  border-radius: 12px;
+}
+
+.instruction-step.video-above .instruction-text {
+  text-align: center;
+}
+
 .instruction-image {
   flex: 0 0 auto;
   width: 300px;

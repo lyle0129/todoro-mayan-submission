@@ -82,7 +82,7 @@ function InstructionalModal({ isOpen, onClose, isFromSettings = false }) {
                 </div>
 
                 <div className="instructions-content">
-                    <div className="instruction-step">
+                    <div className={`instruction-step ${currentInstruction.id === 5 ? 'video-above' : ''}`}>
                         {currentInstruction.image && !imageErrors[currentInstruction.id] && (
                             <div className="instruction-image">
                                 {getMediaType(currentInstruction.image) === 'video' ? (
