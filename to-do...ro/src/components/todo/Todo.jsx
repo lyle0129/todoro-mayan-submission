@@ -22,6 +22,8 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
 
     const [draggedIndex, setDraggedIndex] = useState(null);
     const [draggedOverIndex, setDraggedOverIndex] = useState(null);
+    const [draggedCompletedIndex, setDraggedCompletedIndex] = useState(null);
+    const [draggedOverCompletedIndex, setDraggedOverCompletedIndex] = useState(null);
 
     // Load tasks from localStorage on mount
     useEffect(() => {
@@ -165,6 +167,30 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
 
     function handleDragLeave() {
         setDraggedOverIndex(null);
+    }
+
+    function handleCompletedDragStart(index) {
+        setDraggedCompletedIndex(index);
+    }
+
+    function handleCompletedDragOver(e, index) {
+        e.preventDefault();
+        setDraggedOverCompletedIndex(index);
+    }
+
+    function handleCompletedDragEnd() {
+        if (draggedCompletedIndex !== null && draggedOverCompletedIndex !== null && draggedCompletedIndex !== draggedOverCompletedIndex) {
+            const updatedAccomplished = [...accomplishedTasks];
+            const [draggedTask] = updatedAccomplished.splice(draggedCompletedIndex, 1);
+            updatedAccomplished.splice(draggedOverCompletedIndex, 0, draggedTask);
+            setAccomplishedTasks(updatedAccomplished);
+        }
+        setDraggedCompletedIndex(null);
+        setDraggedOverCompletedIndex(null);
+    }
+
+    function handleCompletedDragLeave() {
+        setDraggedOverCompletedIndex(null);
     }
 
     const completionPercentage = ((accomplishedTasks.length / (tasks.length + accomplishedTasks.length)) * 100) || 0;
@@ -369,7 +395,15 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
                         {displayedCompletedTasks.map((doneTask) => {
                             const originalIndex = accomplishedTasks.indexOf(doneTask);
                             return (
-                                <div key={originalIndex} className="completed-item">
+                                <div 
+                                    key={originalIndex} 
+                                    className={`completed-item ${draggedCompletedIndex === originalIndex ? 'dragging' : ''} ${draggedOverCompletedIndex === originalIndex ? 'drag-over' : ''}`}
+                                    draggable={!searchTerm}
+                                    onDragStart={() => handleCompletedDragStart(originalIndex)}
+                                    onDragOver={(e) => handleCompletedDragOver(e, originalIndex)}
+                                    onDragEnd={handleCompletedDragEnd}
+                                    onDragLeave={handleCompletedDragLeave}
+                                >
                                     <Check size={16} className="completed-icon" />
                                     <span className="completed-text">{doneTask}</span>
                                     <div className="completed-actions">

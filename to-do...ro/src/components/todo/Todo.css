@@ -474,11 +474,23 @@
   border-radius: 12px;
   border: 1px solid #e5e7eb;
   transition: all 0.3s ease;
+  cursor: grab;
 }
 
 .completed-item:hover {
   background: #f3f4f6;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.completed-item.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+  transform: scale(0.98);
+}
+
+.completed-item.drag-over {
+  border-top: 3px solid var(--theme-secondary);
+  padding-top: calc(0.75rem - 2px);
 }
 
 .completed-icon {
