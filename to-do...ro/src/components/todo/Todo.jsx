@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSound } from 'use-sound';
-import { Plus, Trash2, Edit3, Check, Save, Target, RotateCcw, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, X, Undo2, Search } from 'lucide-react';
+import { Plus, Trash2, Edit3, Check, Save, Target, RotateCcw, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, X, Undo2, Search, Square } from 'lucide-react';
 import './Todo.css';
 
 import doneSfx from '../../music/done.mp3';
@@ -272,7 +272,7 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
                         </h3>
                     </div>
                     <div className="section-header-actions">
-x                        {!showAddTask && isActiveExpanded && (
+                        {!showAddTask && isActiveExpanded && (
                             <button
                                 className="add-task-header-btn"
                                 onClick={(e) => {
@@ -378,15 +378,16 @@ x                        {!showAddTask && isActiveExpanded && (
                                         </div>
                                     ) : (
                                         <>
+                                            <button
+                                                className="action-btn complete checkbox-btn"
+                                                onClick={() => completeTask(originalIndex)}
+                                                title="Mark as complete"
+                                            >
+                                                <Square size={16} className="checkbox-icon unchecked" />
+                                                <Check size={16} className="checkbox-icon checked" />
+                                            </button>
                                             <span className="task-text">{task}</span>
                                             <div className="task-actions">
-                                                <button
-                                                    className="action-btn complete"
-                                                    onClick={() => completeTask(originalIndex)}
-                                                    title="Mark as complete"
-                                                >
-                                                    <Check size={16} />
-                                                </button>
                                                 <button
                                                     className="action-btn edit"
                                                     onClick={() => {

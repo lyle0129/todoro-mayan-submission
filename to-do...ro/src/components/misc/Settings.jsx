@@ -47,10 +47,10 @@ const THEMES = {
   }
 };
 
-function Settings({ 
-  isOpen, 
-  onClose, 
-  theme, 
+function Settings({
+  isOpen,
+  onClose,
+  theme,
   onThemeChange,
   workDuration,
   shortBreakDuration,
@@ -123,21 +123,25 @@ function Settings({
                   key={key}
                   className={`theme-option ${theme === key ? 'active' : ''}`}
                   onClick={() => onThemeChange(key)}
-                  style={{ background: themeData.gradient }}
                 >
-                  <div className="theme-preview">
-                    <div 
-                      className="theme-dot" 
-                      style={{ backgroundColor: themeData.primary }}
-                    ></div>
-                    <div 
-                      className="theme-dot" 
-                      style={{ backgroundColor: themeData.secondary }}
-                    ></div>
-                    <div 
-                      className="theme-dot" 
-                      style={{ backgroundColor: themeData.accent }}
-                    ></div>
+                  <div
+                    className="theme-color-preview"
+                    style={{ background: themeData.gradient }}
+                  >
+                    <div className="theme-dots">
+                      <div
+                        className="theme-dot"
+                        style={{ backgroundColor: themeData.primary }}
+                      ></div>
+                      <div
+                        className="theme-dot"
+                        style={{ backgroundColor: themeData.secondary }}
+                      ></div>
+                      <div
+                        className="theme-dot"
+                        style={{ backgroundColor: themeData.accent }}
+                      ></div>
+                    </div>
                   </div>
                   <span className="theme-name">{themeData.name}</span>
                 </button>

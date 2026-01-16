@@ -31,6 +31,7 @@
     opacity: 0;
     transform: translateY(-20px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -84,6 +85,7 @@
 .section-header {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
   color: #374151;
@@ -93,6 +95,7 @@
   font-size: 1.2rem;
   font-weight: 600;
   margin: 0;
+  flex: 0 1 auto;
 }
 
 /* Theme Selection Styles */
@@ -103,47 +106,56 @@
 }
 
 .theme-option {
-  border: 3px solid transparent;
-  border-radius: 16px;
-  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  min-height: 100px;
-  position: relative;
   overflow: hidden;
+  background: white;
 }
 
 .theme-option:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
 }
 
 .theme-option.active {
   border-color: var(--theme-primary);
+  border-width: 3px;
   box-shadow: 0 0 0 1px var(--theme-primary);
 }
 
-.theme-preview {
+.theme-color-preview {
+  width: 100%;
+  height: 60px;
+  border-radius: 10px 10px 0 0;
   display: flex;
-  gap: 0.25rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-dots {
+  display: flex;
+  gap: 6px;
 }
 
 .theme-dot {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.5);
 }
 
 .theme-name {
   font-size: 0.9rem;
   font-weight: 500;
-  color: white;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  color: #374151;
+  padding: 0.75rem;
   text-align: center;
 }
 
@@ -242,11 +254,11 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.toggle-switch input:checked + .toggle-slider {
+.toggle-switch input:checked+.toggle-slider {
   background-color: var(--theme-primary);
 }
 
-.toggle-switch input:checked + .toggle-slider:before {
+.toggle-switch input:checked+.toggle-slider:before {
   transform: translateX(26px);
 }
 
