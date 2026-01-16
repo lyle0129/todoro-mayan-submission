@@ -10,7 +10,7 @@ function App() {
   // Theme state
   const [currentTheme, setCurrentTheme] = useState('dark');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isTodoVisible, setIsTodoVisible] = useState(true);
+  const [isPomodoroVisible, setIsPomodoroVisible] = useState(true);
   const [heatmapShowNumbers, setHeatmapShowNumbers] = useState(false);
   const [isInstructionsOpen, setIsInstructionsOpen] = useState(false);
   const [instructionsFromSettings, setInstructionsFromSettings] = useState(false);
@@ -27,7 +27,7 @@ function App() {
   useEffect(() => {
     const savedTheme = localStorage.getItem('todoro-theme');
     const savedSettings = localStorage.getItem('todoro-settings');
-    const savedTodoVisibility = localStorage.getItem('todoro-todo-visible');
+    const savedPomodoroVisibility = localStorage.getItem('todoro-pomodoro-visible');
     const savedHeatmapShowNumbers = localStorage.getItem('todoro-heatmap-show-numbers');
     const instructionsSeen = localStorage.getItem('todoro-instructions-seen');
 
@@ -44,8 +44,8 @@ function App() {
       }
     }
 
-    if (savedTodoVisibility !== null) {
-      setIsTodoVisible(JSON.parse(savedTodoVisibility));
+    if (savedPomodoroVisibility !== null) {
+      setIsPomodoroVisible(JSON.parse(savedPomodoroVisibility));
     }
 
     if (savedHeatmapShowNumbers !== null) {
@@ -79,10 +79,10 @@ function App() {
     localStorage.setItem('todoro-settings', JSON.stringify(newSettings));
   };
 
-  const toggleTodoVisibility = () => {
-    const newVisibility = !isTodoVisible;
-    setIsTodoVisible(newVisibility);
-    localStorage.setItem('todoro-todo-visible', JSON.stringify(newVisibility));
+  const togglePomodoroVisibility = () => {
+    const newVisibility = !isPomodoroVisible;
+    setIsPomodoroVisible(newVisibility);
+    localStorage.setItem('todoro-pomodoro-visible', JSON.stringify(newVisibility));
   };
 
   const handleHeatmapShowNumbersChange = (showNumbers) => {
@@ -103,7 +103,7 @@ function App() {
   return (
     <div className="app-container">
       <div className="app-header">
-        <div className={`header-content ${!isTodoVisible ? 'centered-header' : ''}`}>
+        <div className={`header-content ${!isPomodoroVisible ? 'centered-header' : ''}`}>
           <div className="title-section">
             <h1 className="app-title">To-doRo</h1>
             <p className="app-subtitle">Productivity meets simplicity</p>
@@ -117,18 +117,21 @@ function App() {
           </button>
         </div>
       </div>
-      <div className={`app-content ${!isTodoVisible ? 'centered' : ''}`}>
-        <Pomodoro
-          workDuration={timerSettings.workDuration}
-          shortBreakDuration={timerSettings.shortBreakDuration}
-          longBreakDuration={timerSettings.longBreakDuration}
-          longBreakInterval={timerSettings.longBreakInterval}
-          isTodoVisible={isTodoVisible}
-          onToggleTodo={toggleTodoVisibility}
-          currentTheme={currentTheme}
-          heatmapShowNumbers={heatmapShowNumbers}
+      <div className={`app-content ${!isPomodoroVisible ? 'centered' : ''}`}>
+        <Todo
+          isPomodoroVisible={isPomodoroVisible}
+          onTogglePomodoro={togglePomodoroVisibility}
         />
-        {isTodoVisible && <Todo />}
+        {isPomodoroVisible && (
+          <Pomodoro
+            workDuration={timerSettings.workDuration}
+            shortBreakDuration={timerSettings.shortBreakDuration}
+            longBreakDuration={timerSettings.longBreakDuration}
+            longBreakInterval={timerSettings.longBreakInterval}
+            currentTheme={currentTheme}
+            heatmapShowNumbers={heatmapShowNumbers}
+          />
+        )}
       </div>
 
       <Settings

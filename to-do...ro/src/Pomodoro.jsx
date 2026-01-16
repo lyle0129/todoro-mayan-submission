@@ -12,8 +12,6 @@ function Pomodoro({
     shortBreakDuration = 5 * 60,
     longBreakDuration = 15 * 60,
     longBreakInterval = 3,
-    isTodoVisible = true,
-    onToggleTodo,
     currentTheme = 'dark',
     heatmapShowNumbers = true
 }) {
@@ -326,19 +324,6 @@ function Pomodoro({
                     <BarChart3 size={16} />
                     <span className="toggle-text">Heatmap</span>
                     {isHeatmapVisible ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                </button>
-                
-                <button
-                    className="todo-toggle-pomodoro"
-                    onClick={onToggleTodo}
-                >
-                    <span className="toggle-text">Tasks</span>
-                    <span className="toggle-icon-desktop">
-                        {isTodoVisible ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-                    </span>
-                    <span className="toggle-icon-mobile">
-                        {isTodoVisible ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                    </span>
                 </button>
             </div>
 

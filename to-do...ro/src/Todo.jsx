@@ -1,18 +1,24 @@
 import { useState, useEffect } from 'react';
 import { useSound } from 'use-sound';
-import { Plus, Trash2, Edit3, Check, Save, Target, RotateCcw } from 'lucide-react';
+import { Plus, Trash2, Edit3, Check, Save, Target, RotateCcw, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, X, Undo2 } from 'lucide-react';
+import TaskFilter from './TaskFilter.jsx';
 import './Todo.css';
 
 import doneSfx from './music/done.mp3';
 import deleteSfx from './music/delete.mp3';
 
-function Todo() {
+function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
     const [tasks, setTasks] = useState([]);
     const [newTask, setNewTask] = useState("");
     const [accomplishedTasks, setAccomplishedTasks] = useState([]);
 
     const [editingIndex, setEditingIndex] = useState(null);
     const [editValue, setEditValue] = useState("");
+
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const [isActiveExpanded, setIsActiveExpanded] = useState(true);
+    const [isCompletedExpanded, setIsCompletedExpanded] = useState(true);
 
     // Load tasks from localStorage on mount
     useEffect(() => {
@@ -116,7 +122,35 @@ function Todo() {
         localStorage.removeItem('todoro-accomplished');
     }
 
+    function markIncomplete(index) {
+        const taskToRestore = accomplishedTasks[index];
+        setTasks(t => [...t, taskToRestore]);
+        const updatedAccomplished = accomplishedTasks.filter((_, i) => i !== index);
+        setAccomplishedTasks(updatedAccomplished);
+    }
+
+    function deleteAccomplishedTask(index) {
+        playDelete({ id: 'delete' });
+        const updatedAccomplished = accomplishedTasks.filter((_, i) => i !== index);
+        setAccomplishedTasks(updatedAccomplished);
+    }
+
+    function clearAllAccomplished() {
+        setAccomplishedTasks([]);
+        localStorage.removeItem('todoro-accomplished');
+    }
+
     const completionPercentage = ((accomplishedTasks.length / (tasks.length + accomplishedTasks.length)) * 100) || 0;
+
+    // Search logic
+    const filterTasks = (taskList) => {
+        return taskList.filter(task =>
+            task.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    };
+
+    const displayedActiveTasks = filterTasks(tasks);
+    const displayedCompletedTasks = filterTasks(accomplishedTasks);
 
     return (
         <div className="todo-container">
@@ -139,16 +173,32 @@ function Todo() {
                     </div>
                 </div>
 
-                {(tasks.length > 0 || accomplishedTasks.length > 0) && (
+                <div className="header-actions">
                     <button
-                        className="clear-all-btn"
-                        onClick={clearAllTasks}
-                        title="Clear all tasks"
+                        className="pomodoro-toggle-btn"
+                        onClick={onTogglePomodoro}
+                        title={isPomodoroVisible ? "Hide Timer" : "Show Timer"}
                     >
-                        <RotateCcw size={16} />
-                        Clear All
+                        <span className="toggle-text">Timer</span>
+                        <span className="toggle-icon-desktop">
+                            {isPomodoroVisible ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+                        </span>
+                        <span className="toggle-icon-mobile">
+                            {isPomodoroVisible ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+                        </span>
                     </button>
-                )}
+
+                    {(tasks.length > 0 || accomplishedTasks.length > 0) && (
+                        <button
+                            className="clear-all-btn"
+                            onClick={clearAllTasks}
+                            title="Clear all tasks"
+                        >
+                            <RotateCcw size={16} />
+                            Clear All
+                        </button>
+                    )}
+                </div>
             </div>
 
             <div className="task-input-section">
@@ -171,86 +221,141 @@ function Todo() {
                 </div>
             </div>
 
+            <TaskFilter
+                onSearchChange={setSearchTerm}
+            />
+
             <div className="tasks-section">
-                <h3 className="section-title">Active Tasks</h3>
-                <div className="task-list">
-                    {tasks.length === 0 ? (
+                <div className="section-header" onClick={() => setIsActiveExpanded(!isActiveExpanded)}>
+                    <h3 className="section-title">
+                        Active Tasks
+                        <span className="task-badge">{displayedActiveTasks.length}</span>
+                    </h3>
+                    <button className="accordion-toggle" title={isActiveExpanded ? "Collapse" : "Expand"}>
+                        {isActiveExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    </button>
+                </div>
+                <div className={`task-list ${isActiveExpanded ? 'expanded' : 'collapsed'}`}>
+                    {displayedActiveTasks.length === 0 ? (
                         <div className="empty-state">
                             <Target size={48} className="empty-icon" />
-                            <p>No active tasks. Add one above!</p>
+                            <p>{searchTerm ? 'No matching tasks' : 'No active tasks. Add one above!'}</p>
                         </div>
                     ) : (
-                        tasks.map((task, index) => (
-                            <div key={index} className="task-item">
-                                {editingIndex === index ? (
-                                    <div className="edit-mode">
-                                        <input
-                                            className="edit-input"
-                                            value={editValue}
-                                            onChange={(e) => setEditValue(e.target.value)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    saveEdit(index);
-                                                } else if (e.key === 'Escape') {
-                                                    setEditingIndex(null);
-                                                }
-                                            }}
-                                            autoFocus
-                                        />
-                                        <button
-                                            className="action-btn save"
-                                            onClick={() => saveEdit(index)}
-                                        >
-                                            <Save size={16} />
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <>
-                                        <span className="task-text">{task}</span>
-                                        <div className="task-actions">
-                                            <button
-                                                className="action-btn complete"
-                                                onClick={() => completeTask(index)}
-                                                title="Mark as complete"
-                                            >
-                                                <Check size={16} />
-                                            </button>
-                                            <button
-                                                className="action-btn edit"
-                                                onClick={() => {
-                                                    setEditingIndex(index);
-                                                    setEditValue(task);
+                        displayedActiveTasks.map((task) => {
+                            const originalIndex = tasks.indexOf(task);
+                            return (
+                                <div key={originalIndex} className="task-item">
+                                    {editingIndex === originalIndex ? (
+                                        <div className="edit-mode">
+                                            <input
+                                                className="edit-input"
+                                                value={editValue}
+                                                onChange={(e) => setEditValue(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        saveEdit(originalIndex);
+                                                    } else if (e.key === 'Escape') {
+                                                        setEditingIndex(null);
+                                                    }
                                                 }}
-                                                title="Edit task"
-                                            >
-                                                <Edit3 size={16} />
-                                            </button>
+                                                autoFocus
+                                            />
                                             <button
-                                                className="action-btn delete"
-                                                onClick={() => deleteTask(index)}
-                                                title="Delete task"
+                                                className="action-btn save"
+                                                onClick={() => saveEdit(originalIndex)}
                                             >
-                                                <Trash2 size={16} />
+                                                <Save size={16} />
                                             </button>
                                         </div>
-                                    </>
-                                )}
-                            </div>
-                        ))
+                                    ) : (
+                                        <>
+                                            <span className="task-text">{task}</span>
+                                            <div className="task-actions">
+                                                <button
+                                                    className="action-btn complete"
+                                                    onClick={() => completeTask(originalIndex)}
+                                                    title="Mark as complete"
+                                                >
+                                                    <Check size={16} />
+                                                </button>
+                                                <button
+                                                    className="action-btn edit"
+                                                    onClick={() => {
+                                                        setEditingIndex(originalIndex);
+                                                        setEditValue(task);
+                                                    }}
+                                                    title="Edit task"
+                                                >
+                                                    <Edit3 size={16} />
+                                                </button>
+                                                <button
+                                                    className="action-btn delete"
+                                                    onClick={() => deleteTask(originalIndex)}
+                                                    title="Delete task"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            )
+                        })
                     )}
                 </div>
             </div>
 
-            {accomplishedTasks.length > 0 && (
+            {displayedCompletedTasks.length > 0 && (
                 <div className="completed-section">
-                    <h3 className="section-title completed">Completed Tasks</h3>
-                    <div className="completed-list">
-                        {accomplishedTasks.map((doneTask, index) => (
-                            <div key={index} className="completed-item">
-                                <Check size={16} className="completed-icon" />
-                                <span className="completed-text">{doneTask}</span>
-                            </div>
-                        ))}
+                    <div className="section-header" onClick={() => setIsCompletedExpanded(!isCompletedExpanded)}>
+                        <h3 className="section-title completed">
+                            Completed Tasks
+                            <span className="task-badge completed">{displayedCompletedTasks.length}</span>
+                        </h3>
+                        <div className="completed-header-actions">
+                            <button
+                                className="clear-accomplished-btn"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    clearAllAccomplished();
+                                }}
+                                title="Delete all completed tasks"
+                            >
+                                <Trash2 size={16} />
+                                Clear Completed
+                            </button>
+                            <button className="accordion-toggle" title={isCompletedExpanded ? "Collapse" : "Expand"}>
+                                {isCompletedExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                            </button>
+                        </div>
+                    </div>
+                    <div className={`completed-list ${isCompletedExpanded ? 'expanded' : 'collapsed'}`}>
+                        {displayedCompletedTasks.map((doneTask) => {
+                            const originalIndex = accomplishedTasks.indexOf(doneTask);
+                            return (
+                                <div key={originalIndex} className="completed-item">
+                                    <Check size={16} className="completed-icon" />
+                                    <span className="completed-text">{doneTask}</span>
+                                    <div className="completed-actions">
+                                        <button
+                                            className="action-btn undo"
+                                            onClick={() => markIncomplete(originalIndex)}
+                                            title="Mark as incomplete"
+                                        >
+                                            <Undo2 size={16} />
+                                        </button>
+                                        <button
+                                            className="action-btn delete"
+                                            onClick={() => deleteAccomplishedTask(originalIndex)}
+                                            title="Delete task"
+                                        >
+                                            <X size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                            )
+                        })}
                     </div>
                 </div>
             )}
