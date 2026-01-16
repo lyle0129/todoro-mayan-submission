@@ -4,18 +4,18 @@ import './Settings.css';
 
 const THEMES = {
   dark: {
-    name: 'Dark Mode',
+    name: 'Midnight Blue',
     gradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
     primary: '#6366f1',
     secondary: '#10b981',
     accent: '#f59e0b'
   },
-  default: {
-    name: 'Ocean Breeze',
-    gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    primary: '#6366f1',
-    secondary: '#10b981',
-    accent: '#f59e0b'
+  lavender: {
+    name: 'Lavender',
+    gradient: '#9b87f5',
+    primary: '#7c3aed',
+    secondary: '#a78bfa',
+    accent: '#c4b5fd'
   },
   sunset: {
     name: 'Sunset Glow',
@@ -31,19 +31,19 @@ const THEMES = {
     secondary: '#0d9488',
     accent: '#84cc16'
   },
-  midnight: {
-    name: 'Midnight Blue',
-    gradient: 'linear-gradient(135deg, #2c3e50 0%, #4a6741 100%)',
-    primary: '#3b82f6',
-    secondary: '#06b6d4',
-    accent: '#8b5cf6'
+  mint: {
+    name: 'Mint',
+    gradient: '#6ee7b7',
+    primary: '#10b981',
+    secondary: '#34d399',
+    accent: '#a7f3d0'
   },
-  cherry: {
-    name: 'Cherry Blossom',
-    gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
-    primary: '#dc2626',
-    secondary: '#ea580c',
-    accent: '#ca8a04'
+  coral: {
+    name: 'Mocha',
+    gradient: '#a0826d',
+    primary: '#92400e',
+    secondary: '#b45309',
+    accent: '#d97706'
   }
 };
 
@@ -117,35 +117,79 @@ function Settings({
               <Palette size={20} />
               <h3>Color Theme</h3>
             </div>
-            <div className="theme-grid">
-              {Object.entries(THEMES).map(([key, themeData]) => (
-                <button
-                  key={key}
-                  className={`theme-option ${theme === key ? 'active' : ''}`}
-                  onClick={() => onThemeChange(key)}
-                >
-                  <div
-                    className="theme-color-preview"
-                    style={{ background: themeData.gradient }}
-                  >
-                    <div className="theme-dots">
+
+            <div className="theme-category">
+              <h4 className="theme-category-label">Gradient Themes</h4>
+              <div className="theme-grid">
+                {['dark', 'sunset', 'forest'].map((key) => {
+                  const themeData = THEMES[key];
+                  return (
+                    <button
+                      key={key}
+                      className={`theme-option ${theme === key ? 'active' : ''}`}
+                      onClick={() => onThemeChange(key)}
+                    >
                       <div
-                        className="theme-dot"
-                        style={{ backgroundColor: themeData.primary }}
-                      ></div>
+                        className="theme-color-preview"
+                        style={{ background: themeData.gradient }}
+                      >
+                        <div className="theme-dots">
+                          <div
+                            className="theme-dot"
+                            style={{ backgroundColor: themeData.primary }}
+                          ></div>
+                          <div
+                            className="theme-dot"
+                            style={{ backgroundColor: themeData.secondary }}
+                          ></div>
+                          <div
+                            className="theme-dot"
+                            style={{ backgroundColor: themeData.accent }}
+                          ></div>
+                        </div>
+                      </div>
+                      <span className="theme-name">{themeData.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="theme-category">
+              <h4 className="theme-category-label">Plain Themes</h4>
+              <div className="theme-grid">
+                {['lavender', 'mint', 'coral'].map((key) => {
+                  const themeData = THEMES[key];
+                  return (
+                    <button
+                      key={key}
+                      className={`theme-option ${theme === key ? 'active' : ''}`}
+                      onClick={() => onThemeChange(key)}
+                    >
                       <div
-                        className="theme-dot"
-                        style={{ backgroundColor: themeData.secondary }}
-                      ></div>
-                      <div
-                        className="theme-dot"
-                        style={{ backgroundColor: themeData.accent }}
-                      ></div>
-                    </div>
-                  </div>
-                  <span className="theme-name">{themeData.name}</span>
-                </button>
-              ))}
+                        className="theme-color-preview"
+                        style={{ background: themeData.gradient }}
+                      >
+                        <div className="theme-dots">
+                          <div
+                            className="theme-dot"
+                            style={{ backgroundColor: themeData.primary }}
+                          ></div>
+                          <div
+                            className="theme-dot"
+                            style={{ backgroundColor: themeData.secondary }}
+                          ></div>
+                          <div
+                            className="theme-dot"
+                            style={{ backgroundColor: themeData.accent }}
+                          ></div>
+                        </div>
+                      </div>
+                      <span className="theme-name">{themeData.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 

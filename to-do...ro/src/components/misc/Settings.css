@@ -99,6 +99,25 @@
 }
 
 /* Theme Selection Styles */
+.theme-category {
+  margin-bottom: 1.5rem;
+}
+
+.theme-category:last-child {
+  margin-bottom: 0;
+}
+
+.theme-category-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.75rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
 .theme-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));

@@ -105,7 +105,10 @@ function App() {
       <div className="app-header">
         <div className={`header-content ${!isPomodoroVisible ? 'centered-header' : ''}`}>
           <div className="title-section">
-            <h1 className="app-title">To-doRo</h1>
+            <div className="title-with-logo">
+              <img src="/mylogo.png" alt="To-doRo Logo" className="app-logo" />
+              <h1 className="app-title">To-doRo</h1>
+            </div>
             <p className="app-subtitle">Productivity meets simplicity</p>
           </div>
           <button
