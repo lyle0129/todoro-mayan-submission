@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSound } from 'use-sound';
 import { Plus, Trash2, Edit3, Check, Save, Target, RotateCcw, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, X, Undo2, Search, Square } from 'lucide-react';
 import './Todo.css';
+import './TodoControls.css';
 
 import doneSfx from '../../music/done.mp3';
 import deleteSfx from '../../music/delete.mp3';
@@ -25,20 +26,53 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
     const [draggedCompletedIndex, setDraggedCompletedIndex] = useState(null);
     const [draggedOverCompletedIndex, setDraggedOverCompletedIndex] = useState(null);
 
+    // create state for starting index
+    const TASKS_PER_PAGE = 5; // change this to how many tasks you want per page
+    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPageAccomplished, setCurrentPageAccomplished] = useState(1);
+
+    // Add sort state
+    const [sortBy, setSortBy] = useState('none'); // 'none', 'date-asc', 'date-desc'
+
+    // Reset pagination when search term or sort changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, sortBy]);
+
+    useEffect(() => {
+        setCurrentPageAccomplished(1);
+    }, [searchTerm, sortBy]);
+
+    // Sort function
+    const sortTasks = (taskList) => {
+        if (sortBy === 'none') return taskList;
+
+        return [...taskList].sort((a, b) => {
+            if (sortBy === 'date-asc') {
+                return a.date - b.date;
+            } else if (sortBy === 'date-desc') {
+                return b.date - a.date;
+            }
+            return 0;
+        });
+    };
+
     // Load tasks from localStorage on mount
     useEffect(() => {
-        const today = new Date().toDateString();
-        const savedDate = localStorage.getItem('todoro-date');
+        // ----- Removed this so that it persists accross days ----- //
+        // const today = new Date().toDateString();
+        // const savedDate = localStorage.getItem('todoro-date');
 
-        // Check if it's a new day - if so, clear all tasks
-        if (savedDate !== today) {
-            localStorage.removeItem('todoro-tasks');
-            localStorage.removeItem('todoro-accomplished');
-            localStorage.setItem('todoro-date', today);
-            setTasks([]);
-            setAccomplishedTasks([]);
-            return;
-        }
+        // // Check if it's a new day - if so, clear all tasks
+        // if (savedDate !== today) {
+        //     localStorage.removeItem('todoro-tasks');
+        //     localStorage.removeItem('todoro-accomplished');
+        //     localStorage.setItem('todoro-date', today);
+        //     setTasks([]);
+        //     setAccomplishedTasks([]);
+        //     return;
+        // }
+        // ---------------------------------------- //
 
         const savedTasks = localStorage.getItem('todoro-tasks');
         const savedAccomplished = localStorage.getItem('todoro-accomplished');
@@ -92,7 +126,12 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
 
     function addTask() {
         if (newTask.trim() !== "") {
-            setTasks(t => [...t, newTask]);
+            const taskObject = {
+                name: newTask,
+                date: Date.now()
+            };
+
+            setTasks(t => [...t, taskObject]); // store task object
             setNewTask("");
             setShowAddTask(false);
         }
@@ -115,7 +154,11 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
     function saveEdit(index) {
         if (editValue.trim() !== "") {
             const updatedTasks = [...tasks];
-            updatedTasks[index] = editValue.trim();
+            updatedTasks[index] = {
+                ...updatedTasks[index],
+                name: editValue.trim(),
+                date: Date.now() // Update date to current timestamp when task is edited
+            }; //updated this also to just update the name; to add set date to last edit
             setTasks(updatedTasks);
         }
         setEditingIndex(null);
@@ -146,17 +189,24 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
         localStorage.removeItem('todoro-accomplished');
     }
 
+    // Handle drag start
     function handleDragStart(index) {
         setDraggedIndex(index);
     }
 
+    // Handle drag over
     function handleDragOver(e, index) {
         e.preventDefault();
         setDraggedOverIndex(index);
     }
 
+    // Handle drag end
     function handleDragEnd() {
-        if (draggedIndex !== null && draggedOverIndex !== null && draggedIndex !== draggedOverIndex) {
+        if (
+            draggedIndex !== null &&
+            draggedOverIndex !== null &&
+            draggedIndex !== draggedOverIndex
+        ) {
             const updatedTasks = [...tasks];
             const [draggedTask] = updatedTasks.splice(draggedIndex, 1);
             updatedTasks.splice(draggedOverIndex, 0, draggedTask);
@@ -166,6 +216,7 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
         setDraggedOverIndex(null);
     }
 
+    // Handle drag leave
     function handleDragLeave() {
         setDraggedOverIndex(null);
     }
@@ -196,15 +247,38 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
 
     const completionPercentage = ((accomplishedTasks.length / (tasks.length + accomplishedTasks.length)) * 100) || 0;
 
-    // Search logic
+    // Search and sort logic
     const filterTasks = (taskList) => {
-        return taskList.filter(task =>
-            task.toLowerCase().includes(searchTerm.toLowerCase())
+        return taskList.filter(item =>
+            item.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
     };
 
-    const displayedActiveTasks = filterTasks(tasks);
-    const displayedCompletedTasks = filterTasks(accomplishedTasks);
+    const sortedActiveTasks = sortTasks(tasks);
+    const sortedCompletedTasks = sortTasks(accomplishedTasks);
+
+    const displayedActiveTasks = filterTasks(sortedActiveTasks);
+    const displayedCompletedTasks = filterTasks(sortedCompletedTasks);
+
+    // Filter tasks based on search term
+    const filteredTasksAccomplished = displayedCompletedTasks.filter(task =>
+        task.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    const totalPagesAccomplished = Math.ceil(filteredTasksAccomplished.length / TASKS_PER_PAGE);
+    const startIndexAccomplished = (currentPageAccomplished - 1) * TASKS_PER_PAGE;
+    const endIndexAccomplished = startIndexAccomplished + TASKS_PER_PAGE;
+    const paginatedTasksAccomplished = filteredTasksAccomplished.slice(startIndexAccomplished, endIndexAccomplished);
+
+    // Filter tasks based on search term
+    const filteredTasks = displayedActiveTasks.filter(task =>
+        task.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Calculate pagination
+    const totalPages = Math.ceil(filteredTasks.length / TASKS_PER_PAGE);
+    const startIndex = (currentPage - 1) * TASKS_PER_PAGE;
+    const endIndex = startIndex + TASKS_PER_PAGE;
+    const paginatedTasks = filteredTasks.slice(startIndex, endIndex);
 
     return (
         <div className="todo-container">
@@ -246,6 +320,17 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
                                 <X size={16} />
                             </button>
                         )}
+                    </div>
+                    <div className="sort-section">
+                        <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value)}
+                            className="sort-select"
+                        >
+                            <option value="none">No sorting</option>
+                            <option value="date-desc">Newest first</option>
+                            <option value="date-asc">Oldest first</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -329,23 +414,21 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
                             <p>{searchTerm ? 'No matching tasks' : 'No active tasks. Click the + icon to get started!'}</p>
                         </div>
                     ) : (
-                        tasks.map((task, originalIndex) => {
-                            // Skip tasks that don't match the search filter
-                            if (!task.toLowerCase().includes(searchTerm.toLowerCase())) {
-                                return null;
-                            }
+                        paginatedTasks.map((task, paginatedIndex) => {
+                            // Find the actual index in the original tasks array
+                            const actualIndex = tasks.findIndex(t => t.name === task.name && t.date === task.date);
 
                             return (
                                 <div
-                                    key={originalIndex}
-                                    className={`task-item ${draggedIndex === originalIndex ? 'dragging' : ''} ${draggedOverIndex === originalIndex ? 'drag-over' : ''}`}
-                                    draggable={!searchTerm && editingIndex !== originalIndex}
-                                    onDragStart={() => handleDragStart(originalIndex)}
-                                    onDragOver={(e) => handleDragOver(e, originalIndex)}
+                                    key={`${task.name}-${task.date}`}
+                                    className={`task-item ${draggedIndex === actualIndex ? 'dragging' : ''} ${draggedOverIndex === actualIndex ? 'drag-over' : ''}`}
+                                    draggable={!searchTerm && editingIndex !== actualIndex && sortBy === 'none'}
+                                    onDragStart={() => handleDragStart(actualIndex)}
+                                    onDragOver={(e) => handleDragOver(e, actualIndex)}
                                     onDragEnd={handleDragEnd}
                                     onDragLeave={handleDragLeave}
                                 >
-                                    {editingIndex === originalIndex ? (
+                                    {editingIndex === actualIndex ? (
                                         <div className="edit-mode">
                                             <input
                                                 className="edit-input"
@@ -353,7 +436,7 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
                                                 onChange={(e) => setEditValue(e.target.value)}
                                                 onKeyDown={(e) => {
                                                     if (e.key === 'Enter') {
-                                                        saveEdit(originalIndex);
+                                                        saveEdit(actualIndex);
                                                     } else if (e.key === 'Escape') {
                                                         setEditingIndex(null);
                                                     }
@@ -362,7 +445,7 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
                                             />
                                             <button
                                                 className="action-btn save"
-                                                onClick={() => saveEdit(originalIndex)}
+                                                onClick={() => saveEdit(actualIndex)}
                                             >
                                                 <Save size={16} />
                                             </button>
@@ -371,19 +454,19 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
                                         <>
                                             <button
                                                 className="action-btn complete checkbox-btn"
-                                                onClick={() => completeTask(originalIndex)}
+                                                onClick={() => completeTask(actualIndex)}
                                                 title="Mark as complete"
                                             >
                                                 <Square size={16} className="checkbox-icon unchecked" />
                                                 <Check size={16} className="checkbox-icon checked" />
                                             </button>
-                                            <span className="task-text">{task}</span>
+                                            <span className="task-text">{task.name}</span>
                                             <div className="task-actions">
                                                 <button
                                                     className="action-btn edit"
                                                     onClick={() => {
-                                                        setEditingIndex(originalIndex);
-                                                        setEditValue(task);
+                                                        setEditingIndex(actualIndex);
+                                                        setEditValue(task.name);
                                                     }}
                                                     title="Edit task"
                                                 >
@@ -391,7 +474,7 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
                                                 </button>
                                                 <button
                                                     className="action-btn delete"
-                                                    onClick={() => deleteTask(originalIndex)}
+                                                    onClick={() => deleteTask(actualIndex)}
                                                     title="Delete task"
                                                 >
                                                     <Trash2 size={16} />
@@ -403,6 +486,28 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
                             )
                         })
                     )}
+
+                    <div className="pagination-controls">
+                        <button
+                            className="pagination-btn"
+                            onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+                            disabled={currentPage === 1}
+                        >
+                            <ChevronLeft size={16} />
+                            Previous
+                        </button>
+                        <span className="pagination-info">
+                            Page {currentPage} of {totalPages || 1}
+                        </span>
+                        <button
+                            className="pagination-btn"
+                            onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+                            disabled={currentPage === totalPages || totalPages === 0}
+                        >
+                            Next
+                            <ChevronRight size={16} />
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -431,35 +536,33 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
                         </div>
                     </div>
                     <div className={`completed-list ${isCompletedExpanded ? 'expanded' : 'collapsed'}`}>
-                        {accomplishedTasks.map((doneTask, originalIndex) => {
-                            // Skip tasks that don't match the search filter
-                            if (!doneTask.toLowerCase().includes(searchTerm.toLowerCase())) {
-                                return null;
-                            }
+                        {paginatedTasksAccomplished.map((doneTask, paginatedIndex) => {
+                            // Find the actual index in the original accomplished tasks array
+                            const actualIndex = accomplishedTasks.findIndex(t => t.name === doneTask.name && t.date === doneTask.date);
 
                             return (
                                 <div
-                                    key={originalIndex}
-                                    className={`completed-item ${draggedCompletedIndex === originalIndex ? 'dragging' : ''} ${draggedOverCompletedIndex === originalIndex ? 'drag-over' : ''}`}
-                                    draggable={!searchTerm}
-                                    onDragStart={() => handleCompletedDragStart(originalIndex)}
-                                    onDragOver={(e) => handleCompletedDragOver(e, originalIndex)}
+                                    key={`${doneTask.name}-${doneTask.date}`}
+                                    className={`completed-item ${draggedCompletedIndex === actualIndex ? 'dragging' : ''} ${draggedOverCompletedIndex === actualIndex ? 'drag-over' : ''}`}
+                                    draggable={!searchTerm && sortBy === 'none'}
+                                    onDragStart={() => handleCompletedDragStart(actualIndex)}
+                                    onDragOver={(e) => handleCompletedDragOver(e, actualIndex)}
                                     onDragEnd={handleCompletedDragEnd}
                                     onDragLeave={handleCompletedDragLeave}
                                 >
                                     <Check size={16} className="completed-icon" />
-                                    <span className="completed-text">{doneTask}</span>
+                                    <span className="completed-text">{doneTask.name}</span>
                                     <div className="completed-actions">
                                         <button
                                             className="action-btn undo"
-                                            onClick={() => markIncomplete(originalIndex)}
+                                            onClick={() => markIncomplete(actualIndex)}
                                             title="Mark as incomplete"
                                         >
                                             <Undo2 size={16} />
                                         </button>
                                         <button
                                             className="action-btn delete"
-                                            onClick={() => deleteAccomplishedTask(originalIndex)}
+                                            onClick={() => deleteAccomplishedTask(actualIndex)}
                                             title="Delete task"
                                         >
                                             <Trash2 size={16} />
@@ -468,6 +571,27 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
                                 </div>
                             )
                         })}
+                        <div className="pagination-controls">
+                            <button
+                                className="pagination-btn"
+                                onClick={() => setCurrentPageAccomplished(p => Math.max(p - 1, 1))}
+                                disabled={currentPageAccomplished === 1}
+                            >
+                                <ChevronLeft size={16} />
+                                Previous
+                            </button>
+                            <span className="pagination-info">
+                                Page {currentPageAccomplished} of {totalPagesAccomplished || 1}
+                            </span>
+                            <button
+                                className="pagination-btn"
+                                onClick={() => setCurrentPageAccomplished(p => Math.min(p + 1, totalPagesAccomplished))}
+                                disabled={currentPageAccomplished === totalPagesAccomplished || totalPagesAccomplished === 0}
+                            >
+                                Next
+                                <ChevronRight size={16} />
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
