@@ -1,0 +1,189 @@
+/* Undo Notifications */
+.undo-notifications {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 350px;
+}
+
+.undo-notification {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  animation: slideInRight 0.3s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Different colors for different action types */
+.undo-notification.undo-complete {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+}
+
+.undo-notification.undo-delete {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+}
+
+.undo-notification.undo-edit {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+}
+
+.undo-notification.undo-clearAll,
+.undo-notification.undo-clearAccomplished {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+}
+
+.undo-notification.undo-markIncomplete {
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
+  box-shadow: 0 8px 25px rgba(6, 182, 212, 0.3);
+}
+
+/* Stacking animation for multiple notifications */
+.undo-notification:nth-child(n+2) {
+  margin-top: -2px;
+  transform: scale(0.98);
+  opacity: 0.95;
+}
+
+.undo-notification:nth-child(n+3) {
+  transform: scale(0.96);
+  opacity: 0.9;
+}
+
+.undo-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.undo-icon {
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.undo-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.undo-timer {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+.undo-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.undo-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .undo-notifications {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+    max-width: none;
+  }
+
+  .undo-notification {
+    padding: 0.875rem;
+    gap: 0.75rem;
+  }
+
+  .undo-text {
+    font-size: 0.85rem;
+  }
+
+  .undo-timer {
+    font-size: 0.75rem;
+  }
+
+  .undo-btn {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    gap: 0.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .undo-notifications {
+    top: 0.75rem;
+    left: 0.75rem;
+    right: 0.75rem;
+  }
+
+  .undo-notification {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .undo-content {
+    gap: 0.5rem;
+  }
+
+  .undo-text {
+    font-size: 0.8rem;
+  }
+
+  .undo-timer {
+    font-size: 0.7rem;
+  }
+
+  .undo-btn {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.75rem;
+  }
+}

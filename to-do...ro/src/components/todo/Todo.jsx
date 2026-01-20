@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useSound } from 'use-sound';
 import { Plus, Trash2, Edit3, Check, Save, Target, RotateCcw, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, X, Undo2, Search, Square } from 'lucide-react';
+import UndoNotifications from './UndoNotifications.jsx';
+import { useUndo } from '../../hooks/useUndo.js';
 import './Todo.css';
 import './TodoControls.css';
 
@@ -25,6 +27,9 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
     const [draggedOverIndex, setDraggedOverIndex] = useState(null);
     const [draggedCompletedIndex, setDraggedCompletedIndex] = useState(null);
     const [draggedOverCompletedIndex, setDraggedOverCompletedIndex] = useState(null);
+
+    // Use the custom undo hook
+    const { undoableActions, createUndoAction, removeUndoAction } = useUndo();
 
     // create state for starting index
     const TASKS_PER_PAGE = 5; // change this to how many tasks you want per page
@@ -139,54 +144,235 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
 
     function deleteTask(index) {
         playDelete({ id: 'delete' });
-        const updatedTasks = tasks.filter((_, i) => i !== index)
+        const taskToDelete = tasks[index];
+
+        // Create undo data
+        const undoData = {
+            task: taskToDelete,
+            originalIndex: index
+        };
+
+        // Remove task
+        const updatedTasks = tasks.filter((_, i) => i !== index);
         setTasks(updatedTasks);
+
+        // Create undo action
+        createUndoAction('delete', undoData, `Task "${taskToDelete.name}" deleted`);
     }
 
     function completeTask(index) {
         playDone({ id: 'done' });
         const taskCompleted = tasks[index];
+
+        // Create undo data
+        const undoData = {
+            task: taskCompleted,
+            originalIndex: index
+        };
+
+        // Add task to accomplished and remove from active
         setAccomplishedTasks(a => [...a, taskCompleted]);
-        const updatedTasks = tasks.filter((_, i) => i !== index)
+        const updatedTasks = tasks.filter((_, i) => i !== index);
         setTasks(updatedTasks);
+
+        // Create undo action
+        createUndoAction('complete', undoData, `Task "${taskCompleted.name}" completed`);
     }
 
     function saveEdit(index) {
         if (editValue.trim() !== "") {
+            const originalTask = tasks[index];
             const updatedTasks = [...tasks];
+
+            // Create undo data before making changes
+            const undoData = {
+                task: originalTask,
+                originalIndex: index,
+                newName: editValue.trim()
+            };
+
             updatedTasks[index] = {
                 ...updatedTasks[index],
                 name: editValue.trim(),
                 date: Date.now() // Update date to current timestamp when task is edited
-            }; //updated this also to just update the name; to add set date to last edit
+            };
             setTasks(updatedTasks);
+
+            // Create undo action
+            createUndoAction('edit', undoData, `Task "${originalTask.name}" edited to "${editValue.trim()}"`);
         }
         setEditingIndex(null);
     }
 
     function clearAllTasks() {
-        setTasks([]);
-        setAccomplishedTasks([]);
-        localStorage.removeItem('todoro-tasks');
-        localStorage.removeItem('todoro-accomplished');
+        // Store current state for undo
+        const currentTasks = [...tasks];
+        const currentAccomplished = [...accomplishedTasks];
+
+        // Only create undo if there are tasks to clear
+        if (currentTasks.length > 0 || currentAccomplished.length > 0) {
+            const undoData = {
+                tasks: currentTasks,
+                accomplishedTasks: currentAccomplished
+            };
+
+            // Clear all tasks
+            setTasks([]);
+            setAccomplishedTasks([]);
+            localStorage.removeItem('todoro-tasks');
+            localStorage.removeItem('todoro-accomplished');
+
+            // Create undo action
+            const totalTasks = currentTasks.length + currentAccomplished.length;
+            createUndoAction('clearAll', undoData, `${totalTasks} task${totalTasks !== 1 ? 's' : ''} cleared`);
+        }
     }
 
     function markIncomplete(index) {
         const taskToRestore = accomplishedTasks[index];
+
+        // Create undo data
+        const undoData = {
+            task: taskToRestore,
+            originalIndex: index
+        };
+
+        // Move task from accomplished to active
         setTasks(t => [...t, taskToRestore]);
         const updatedAccomplished = accomplishedTasks.filter((_, i) => i !== index);
         setAccomplishedTasks(updatedAccomplished);
+
+        // Create undo action
+        createUndoAction('markIncomplete', undoData, `Task "${taskToRestore.name}" marked as incomplete`);
     }
 
     function deleteAccomplishedTask(index) {
         playDelete({ id: 'delete' });
+        const taskToDelete = accomplishedTasks[index];
+
+        // Create undo data
+        const undoData = {
+            task: taskToDelete,
+            originalIndex: index
+        };
+
+        // Remove task
         const updatedAccomplished = accomplishedTasks.filter((_, i) => i !== index);
         setAccomplishedTasks(updatedAccomplished);
+
+        // Create undo action
+        createUndoAction('deleteCompleted', undoData, `Completed task "${taskToDelete.name}" deleted`);
     }
 
     function clearAllAccomplished() {
-        setAccomplishedTasks([]);
-        localStorage.removeItem('todoro-accomplished');
+        // Store current accomplished tasks for undo
+        const currentAccomplished = [...accomplishedTasks];
+
+        // Only create undo if there are accomplished tasks to clear
+        if (currentAccomplished.length > 0) {
+            const undoData = {
+                accomplishedTasks: currentAccomplished
+            };
+
+            // Clear accomplished tasks
+            setAccomplishedTasks([]);
+            localStorage.removeItem('todoro-accomplished');
+
+            // Create undo action
+            createUndoAction('clearAccomplished', undoData, `${currentAccomplished.length} completed task${currentAccomplished.length !== 1 ? 's' : ''} cleared`);
+        }
+    }
+
+    // Undo function
+    function handleUndo(undoId) {
+        const action = undoableActions.find(a => a.id === undoId);
+        if (!action) return;
+
+        switch (action.type) {
+            case 'complete':
+                // Remove from accomplished tasks
+                setAccomplishedTasks(prev =>
+                    prev.filter(task =>
+                        !(task.name === action.data.task.name && task.date === action.data.task.date)
+                    )
+                );
+                // Add back to active tasks
+                setTasks(prev => [...prev, action.data.task]);
+                break;
+
+            case 'delete':
+                // Restore deleted task at its original position or at the end if position is invalid
+                setTasks(prev => {
+                    const newTasks = [...prev];
+                    const insertIndex = Math.min(action.data.originalIndex, newTasks.length);
+                    newTasks.splice(insertIndex, 0, action.data.task);
+                    return newTasks;
+                });
+                break;
+
+            case 'edit':
+                // Restore original task name
+                setTasks(prev =>
+                    prev.map((task, index) => {
+                        if (index === action.data.originalIndex) {
+                            return {
+                                ...task,
+                                name: action.data.task.name,
+                                date: action.data.task.date
+                            };
+                        }
+                        return task;
+                    })
+                );
+                break;
+
+            case 'deleteCompleted':
+                // Restore deleted completed task at its original position
+                setAccomplishedTasks(prev => {
+                    const newTasks = [...prev];
+                    const insertIndex = Math.min(action.data.originalIndex, newTasks.length);
+                    newTasks.splice(insertIndex, 0, action.data.task);
+                    return newTasks;
+                });
+                break;
+
+            case 'clearAll':
+                // Restore all tasks and accomplished tasks
+                setTasks(action.data.tasks);
+                setAccomplishedTasks(action.data.accomplishedTasks);
+                // Restore to localStorage
+                localStorage.setItem('todoro-tasks', JSON.stringify(action.data.tasks));
+                localStorage.setItem('todoro-accomplished', JSON.stringify(action.data.accomplishedTasks));
+                break;
+
+            case 'markIncomplete':
+                // Move task back to accomplished from active
+                setAccomplishedTasks(prev => {
+                    const newTasks = [...prev];
+                    const insertIndex = Math.min(action.data.originalIndex, newTasks.length);
+                    newTasks.splice(insertIndex, 0, action.data.task);
+                    return newTasks;
+                });
+                // Remove from active tasks
+                setTasks(prev =>
+                    prev.filter(task =>
+                        !(task.name === action.data.task.name && task.date === action.data.task.date)
+                    )
+                );
+                break;
+
+            case 'clearAccomplished':
+                // Restore all accomplished tasks
+                setAccomplishedTasks(action.data.accomplishedTasks);
+                localStorage.setItem('todoro-accomplished', JSON.stringify(action.data.accomplishedTasks));
+                break;
+
+            default:
+                break;
+        }
+
+        // Remove the undo action using the hook
+        removeUndoAction(undoId);
     }
 
     // Handle drag start
@@ -254,27 +440,29 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
         );
     };
 
+    // Step 1 - Sort first, in default no sorting then tas to be passed in the search filter
     const sortedActiveTasks = sortTasks(tasks);
     const sortedCompletedTasks = sortTasks(accomplishedTasks);
 
     const displayedActiveTasks = filterTasks(sortedActiveTasks);
     const displayedCompletedTasks = filterTasks(sortedCompletedTasks);
 
-    // Filter tasks based on search term
+    // Step 2 - Filter tasks based on search term - then pass it to pagination 
     const filteredTasksAccomplished = displayedCompletedTasks.filter(task =>
         task.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
+    // Calculate pagination -- then map paginated task below
     const totalPagesAccomplished = Math.ceil(filteredTasksAccomplished.length / TASKS_PER_PAGE);
     const startIndexAccomplished = (currentPageAccomplished - 1) * TASKS_PER_PAGE;
     const endIndexAccomplished = startIndexAccomplished + TASKS_PER_PAGE;
     const paginatedTasksAccomplished = filteredTasksAccomplished.slice(startIndexAccomplished, endIndexAccomplished);
 
-    // Filter tasks based on search term
+    // Step 2 - Filter tasks based on search term - then pass it to pagination 
     const filteredTasks = displayedActiveTasks.filter(task =>
         task.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // Calculate pagination
+    // Calculate pagination -- then map paginated task below
     const totalPages = Math.ceil(filteredTasks.length / TASKS_PER_PAGE);
     const startIndex = (currentPage - 1) * TASKS_PER_PAGE;
     const endIndex = startIndex + TASKS_PER_PAGE;
@@ -282,6 +470,11 @@ function Todo({ isPomodoroVisible = true, onTogglePomodoro }) {
 
     return (
         <div className="todo-container">
+            {/* Undo Notifications */}
+            <UndoNotifications
+                undoableActions={undoableActions}
+                onUndo={handleUndo}
+            />
             <div className="todo-header">
                 <div className="progress-section">
                     <div className="progress-info">
